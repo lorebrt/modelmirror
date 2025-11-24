@@ -2,7 +2,6 @@
 name = "modelmirror"
 version = "0.1.6"
 description = "Model Mirror"
-author = "lorenzo.bretto@enyr.eu"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -14,6 +13,16 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 license = "MIT"
+
+# Better author syntax (optional but recommended)
+authors = [
+  { name = "Lorenzo Bretto", email = "lorenzo.bretto@enyr.eu" }
+]
+
+[project.urls]
+Homepage = "https://github.com/lorebrt/modelmirror"
+Repository = "https://github.com/lorebrt/modelmirror"
+Issues = "https://github.com/lorebrt/modelmirror/issues"
 
 [dependency-groups]
 dev = [
