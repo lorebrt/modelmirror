@@ -1,34 +1,41 @@
-ARG BASE_IMAGE=registry.gitlab.com/n-model/base-images/python:3.12
+ARG BASE_IMAGE=python:3.12-slim-bullseye
 ARG UV_VERSION=0.7.2
+
 FROM ghcr.io/astral-sh/uv:${UV_VERSION} AS uv
 
-# BASE STAGE
-FROM ${BASE_IMAGE}  AS base
-USER root
-RUN chown -R $USERNAME:$USERNAME /workspace
-RUN chown -R $USERNAME:$USERNAME /run
-RUN apt-get update && \
-    apt-get install -y gnupg2 gettext && \
-    rm -rf /var/lib/apt/lists/*
-USER $USERNAME
+FROM ${BASE_IMAGE} AS base
 
-# DEV STAGE
-FROM base  AS dev
+ARG USERNAME=non-root
+ARG USER_UID=1000
+ARG USER_GID=${USER_UID}
+
+ENV USERNAME=${USERNAME}
+
+RUN set -eux; \
+    apt-get update -qq; \
+    apt-get install -y --no-install-recommends bash; \
+    rm -rf /var/lib/apt/lists/*; \
+    groupadd --gid "${USER_GID}" "${USERNAME}"; \
+    useradd --uid "${USER_UID}" --gid "${USER_GID}" -m -s /bin/bash "${USERNAME}"
+
+WORKDIR /workspace
+
+ENV PYTHONPATH=/workspace
+
+RUN chown -R "${USERNAME}:${USERNAME}" /workspace /run || true
+
+USER ${USERNAME}
+
+FROM base AS dev
 COPY --from=uv /uv /uvx /bin/
 
-# BUILD STAGE (for optimization)
 FROM dev AS builder
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
+RUN --mount=type=cache,target=/home/${USERNAME}/.cache/uv \
+    --mount=type=bind,source=pyproject.toml,target=/workspace/pyproject.toml,ro \
+    --mount=type=bind,source=uv.lock,target=/workspace/uv.lock,ro \
     uv sync --locked --no-install-project
-COPY ./pyproject.toml ./uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked
 
-# PROD STAGE
-FROM base AS prod
-COPY --from=builder /workspace/.venv /workspace/.venv
-COPY ./app ./app
-ENV PYTHONPATH=./app
-CMD [".venv/bin/fastapi", "run", "./app/main.py", "--port", "8088"]
+COPY pyproject.toml uv.lock ./
+
+RUN --mount=type=cache,target=/home/${USERNAME}/.cache/uv \
+    uv sync --locked
