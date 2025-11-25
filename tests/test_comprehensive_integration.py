@@ -179,14 +179,16 @@ class TestComprehensiveIntegration(unittest.TestCase):
         """Test that singleton references are memory efficient."""
         instances = self.mirror.reflect_raw('tests/configs/memory_test.json')
         
-        # Get all database instances
-        databases = instances.get(list[DatabaseService])
+        # Get all user services that reference the shared database
+        user_services = instances.get(list[UserService])
         
-        # Count unique instances (should be fewer than total references)
-        unique_databases = set(id(db) for db in databases)
+        # All user services should share the same database instance
+        self.assertEqual(len(user_services), 3)
         
-        # Should have singleton sharing
-        self.assertLess(len(unique_databases), len(databases))
+        # Verify all services reference the same database instance
+        shared_db = user_services[0].database
+        for service in user_services[1:]:
+            self.assertIs(service.database, shared_db)
 
     def test_configuration_composition_patterns(self):
         """Test advanced composition patterns."""

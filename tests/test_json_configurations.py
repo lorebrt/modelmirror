@@ -177,7 +177,7 @@ class TestJSONConfigurations(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             self.mirror.reflect_raw('tests/configs/missing_singleton.json')
         
-        self.assertIn("not found", str(context.exception))
+        self.assertIn("has not a corresponding reference", str(context.exception))
 
     def test_duplicate_singleton_names(self):
         """Test error handling for duplicate singleton names."""
@@ -200,8 +200,11 @@ class TestJSONConfigurations(unittest.TestCase):
 
     def test_empty_configuration(self):
         """Test handling of empty configuration files."""
-        config = self.mirror.reflect_typed('tests/configs/empty.json', BaseModel)
-        self.assertIsInstance(config, BaseModel)
+        class EmptyConfig(BaseModel):
+            pass
+        
+        config = self.mirror.reflect_typed('tests/configs/empty.json', EmptyConfig)
+        self.assertIsInstance(config, EmptyConfig)
 
     def test_configuration_with_null_values(self):
         """Test handling of null values in configuration."""

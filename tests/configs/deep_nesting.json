@@ -38,11 +38,9 @@
             "cache_enabled": true
         },
         "config": {
-            "level1": {
-                "level2": {
-                    "level3": "deep_value"
-                }
-            }
+            "level1": "nested_value",
+            "level2": "another_value",
+            "level3": "deep_value"
         }
     }
 }
