@@ -97,7 +97,8 @@ class TestComprehensiveIntegration(unittest.TestCase):
     def test_configuration_with_environment_overrides(self):
         """Test configuration that simulates environment-specific overrides."""
         # Test development environment
-        dev_config = self.mirror.reflect_typed(
+        dev_mirror = Mirror('tests.fixtures')
+        dev_config = dev_mirror.reflect_typed(
             'tests/configs/environment_dev.json',
             FullApplicationConfig
         )
@@ -106,8 +107,9 @@ class TestComprehensiveIntegration(unittest.TestCase):
         self.assertEqual(dev_config.debug_mode, True)
         self.assertEqual(dev_config.primary_database.host, "localhost")
         
-        # Test production environment  
-        prod_config = self.mirror.reflect_typed(
+        # Test production environment with new Mirror instance
+        prod_mirror = Mirror('tests.fixtures')
+        prod_config = prod_mirror.reflect_typed(
             'tests/configs/environment_prod.json',
             FullApplicationConfig
         )

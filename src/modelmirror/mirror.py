@@ -23,6 +23,7 @@ class Mirror:
         self.__singleton_path: dict[str, str] = {}
 
     def reflect_typed(self, config_path: str, model: type[T]) -> T:
+        self.__auto_reset()
         reflection_config_file = self.__get_reflection_config_file(config_path)
         with open(reflection_config_file) as file:
             json_utils.json_load_with_context(file, self.__create_instance_map)
@@ -32,10 +33,16 @@ class Mirror:
             return model(**raw_model)
 
     def reflect_raw(self, config_path: str) -> Reflections:
+        self.__auto_reset()
         reflection_config_file = self.__get_reflection_config_file(config_path)
         with open(reflection_config_file) as file:
             json_utils.json_load_with_context(file, self.__create_instance_map)
             return Reflections(self.__resolve_instances(), self.__singleton_path)
+
+    def __auto_reset(self) -> None:
+        self.__instance_properties = {}
+        self.__reference_service = ReferenceService()
+        self.__singleton_path = {}
 
     def __instantiate_model(self, instances: dict[str, Any]):
         def _hook(node_context: json_utils.NodeContext) -> Any:

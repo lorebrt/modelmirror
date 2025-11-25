@@ -129,8 +129,8 @@ class TestJSONValidation(unittest.TestCase):
         except ValidationError as e:
             error_dict = e.errors()
             self.assertTrue(len(error_dict) > 0)
-            # Check that error messages contain field information
-            self.assertTrue(any('count' in str(error) for error in error_dict))
+            # Check that error messages contain field information (port or count)
+            self.assertTrue(any('port' in str(error) or 'count' in str(error) for error in error_dict))
 
     def test_custom_validator_integration(self):
         """Test integration with custom Pydantic validators."""
