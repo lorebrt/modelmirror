@@ -1,0 +1,57 @@
+{
+    "database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            },
+            "instance": "main_database"
+        },
+        "host": "localhost",
+        "port": 5432,
+        "database_name": "app_db"
+    },
+    "user_service": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": "$main_database",
+        "cache_enabled": true
+    },
+    "services": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                },
+                "instance": "primary_service"
+            },
+            "name": "primary"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "secondary"
+        }
+    ],
+    "service_map": {
+        "primary": "$primary_service",
+        "backup": {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "backup"
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "required_service": {
+        "$reference": {
+            "registry": {
+                "schema": "simple_service",
+                "version": "1.0.0"
+            }
+        },
+        "name": "required"
+    },
+    "optional_service": {
+        "$reference": {
+            "registry": {
+                "schema": "simple_service",
+                "version": "1.0.0"
+            }
+        },
+        "name": "optional"
+    },
+    "optional_string": "provided_value"
+}

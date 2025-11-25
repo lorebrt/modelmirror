@@ -1,0 +1,25 @@
+{
+    "service_a": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            },
+            "instance": "a"
+        },
+        "database": "$b",
+        "cache_enabled": true
+    },
+    "service_b": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            },
+            "instance": "b"
+        },
+        "host": "$a",
+        "port": 5432,
+        "database_name": "circular"
+    }
+}

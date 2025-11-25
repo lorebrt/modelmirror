@@ -1,0 +1,31 @@
+{
+    "service": {
+        "$reference": {
+            "registry": {
+                "schema": "simple_service",
+                "version": "1.0.0"
+            }
+        },
+        "name": "union_simple"
+    },
+    "services": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "first"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "second"
+        }
+    ]
+}

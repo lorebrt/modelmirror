@@ -1,0 +1,1 @@
+{"service": {"$reference": {"instance": "test_instance"}, "name": "test"}}

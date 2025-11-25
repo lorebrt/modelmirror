@@ -1,0 +1,21 @@
+{
+    "service": {
+        "$reference": {
+            "registry": {
+                "schema": "configurable_service",
+                "version": "1.0.0"
+            }
+        },
+        "service": {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "invalid_service"
+        },
+        "timeout": 500,
+        "retries": 15
+    }
+}

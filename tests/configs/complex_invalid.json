@@ -1,0 +1,49 @@
+{
+    "primary_database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "",
+        "port": -1,
+        "database_name": "invalid_app"
+    },
+    "secondary_database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "invalid-secondary.db.example.com",
+        "port": 99999,
+        "database_name": "invalid_secondary"
+    },
+    "user_service": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "user.invalid.db.example.com",
+            "port": 5432,
+            "database_name": "users"
+        },
+        "cache_enabled": "invalid_boolean"
+    },
+    "microservices": "should_be_array",
+    "service_registry": [],
+    "orchestrator": null,
+    "environment": 123,
+    "debug_mode": "invalid_boolean"
+}

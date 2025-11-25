@@ -1,0 +1,73 @@
+{
+    "core_system": {
+        "$reference": {
+            "registry": {
+                "schema": "complex_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "core.db.example.com",
+            "port": 5432,
+            "database_name": "core_system"
+        },
+        "user_service": {
+            "$reference": {
+                "registry": {
+                    "schema": "user_service",
+                    "version": "1.0.0"
+                }
+            },
+            "database": {
+                "$reference": {
+                    "registry": {
+                        "schema": "database_service",
+                        "version": "1.0.0"
+                    }
+                },
+                "host": "users.db.example.com",
+                "port": 5432,
+                "database_name": "users"
+            },
+            "cache_enabled": true
+        },
+        "config": {
+            "plugin_enabled": "true"
+        }
+    },
+    "plugins": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "auth_plugin"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "logging_plugin"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "metrics_plugin"
+        }
+    ]
+}

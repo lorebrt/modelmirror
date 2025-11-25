@@ -1,0 +1,24 @@
+{
+    "services": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                },
+                "instance": "shared_service"
+            },
+            "name": "shared"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "unique"
+        },
+        "$shared_service"
+    ]
+}

@@ -1,0 +1,36 @@
+{
+    "database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "serialization.db.example.com",
+        "port": 5432,
+        "database_name": "serialization_db"
+    },
+    "user_service": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "user.serialization.db.example.com",
+            "port": 5432,
+            "database_name": "user_serialization"
+        },
+        "cache_enabled": true
+    },
+    "metadata": {
+        "serialization": "test"
+    }
+}

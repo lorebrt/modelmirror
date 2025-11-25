@@ -1,0 +1,14 @@
+
+        {
+            // This is a comment
+            "service": {
+                "$reference": {
+                    "registry": {
+                        "schema": "simple_service",
+                        "version": "1.0.0"
+                    }
+                },
+                "name": "test" /* inline comment */
+            }
+        }
+        

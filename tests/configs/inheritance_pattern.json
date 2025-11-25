@@ -1,0 +1,36 @@
+{
+    "complex_service": {
+        "$reference": {
+            "registry": {
+                "schema": "complex_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                },
+                "instance": "base_db"
+            },
+            "host": "base.example.com",
+            "port": 5432,
+            "database_name": "base_db"
+        },
+        "user_service": {
+            "$reference": {
+                "registry": {
+                    "schema": "user_service",
+                    "version": "1.0.0"
+                }
+            },
+            "database": "$base_db",
+            "cache_enabled": true
+        },
+        "config": {
+            "base_config": "inherited",
+            "extended_config": "added"
+        }
+    }
+}

@@ -1,0 +1,15 @@
+{
+    "service": {
+        "$reference": {
+            "registry": {
+                "schema": "validation_service",
+                "version": "1.0.0"
+            }
+        },
+        "name": "test_service",
+        "port": 8080,
+        "enabled": true
+    },
+    "name": "valid_config",
+    "count": 42
+}

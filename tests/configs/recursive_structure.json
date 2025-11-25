@@ -1,0 +1,11 @@
+{
+    "service": {
+        "$reference": {
+            "registry": {
+                "schema": "simple_service",
+                "version": "1.0.0"
+            }
+        },
+        "name": "recursive_service"
+    }
+}

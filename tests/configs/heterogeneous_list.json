@@ -1,0 +1,44 @@
+{
+    "mixed_services": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "simple"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "localhost",
+            "port": 5432,
+            "database_name": "mixed_db"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "user_service",
+                    "version": "1.0.0"
+                }
+            },
+            "database": {
+                "$reference": {
+                    "registry": {
+                        "schema": "database_service",
+                        "version": "1.0.0"
+                    }
+                },
+                "host": "user_host",
+                "port": 3306,
+                "database_name": "users"
+            },
+            "cache_enabled": false
+        }
+    ]
+}

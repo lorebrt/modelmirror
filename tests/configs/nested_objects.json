@@ -1,0 +1,36 @@
+{
+    "complex_service": {
+        "$reference": {
+            "registry": {
+                "schema": "complex_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                },
+                "instance": "nested_db"
+            },
+            "host": "nested.example.com",
+            "port": 5432,
+            "database_name": "nested_db"
+        },
+        "user_service": {
+            "$reference": {
+                "registry": {
+                    "schema": "user_service",
+                    "version": "1.0.0"
+                }
+            },
+            "database": "$nested_db",
+            "cache_enabled": false
+        },
+        "config": {
+            "environment": "test",
+            "debug": "true"
+        }
+    }
+}

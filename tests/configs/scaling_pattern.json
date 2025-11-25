@@ -1,0 +1,71 @@
+{
+    "load_balancer_db": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "lb.db.example.com",
+        "port": 5432,
+        "database_name": "load_balancer"
+    },
+    "shard_db": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "shard.db.example.com",
+        "port": 5432,
+        "database_name": "shard_1"
+    },
+    "worker_services": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "worker_1"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "worker_2"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "worker_3"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "worker_4"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "worker_5"
+        }
+    ]
+}

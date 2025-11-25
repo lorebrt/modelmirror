@@ -1,0 +1,110 @@
+{
+    "primary_database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "valid.db.example.com",
+        "port": 5432,
+        "database_name": "valid_app"
+    },
+    "secondary_database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "valid-secondary.db.example.com",
+        "port": 5432,
+        "database_name": "valid_secondary"
+    },
+    "user_service": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "user.db.example.com",
+            "port": 5432,
+            "database_name": "users"
+        },
+        "cache_enabled": true
+    },
+    "microservices": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "valid_service"
+        }
+    ],
+    "service_registry": {
+        "main": {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "main_service"
+        }
+    },
+    "orchestrator": {
+        "$reference": {
+            "registry": {
+                "schema": "complex_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "orchestrator.db.example.com",
+            "port": 5432,
+            "database_name": "orchestrator"
+        },
+        "user_service": {
+            "$reference": {
+                "registry": {
+                    "schema": "user_service",
+                    "version": "1.0.0"
+                }
+            },
+            "database": {
+                "$reference": {
+                    "registry": {
+                        "schema": "database_service",
+                        "version": "1.0.0"
+                    }
+                },
+                "host": "orch-user.db.example.com",
+                "port": 5432,
+                "database_name": "orch_users"
+            },
+            "cache_enabled": true
+        },
+        "config": {
+            "valid": "true"
+        }
+    },
+    "environment": "test",
+    "debug_mode": false
+}

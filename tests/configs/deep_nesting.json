@@ -1,0 +1,48 @@
+{
+    "complex_service": {
+        "$reference": {
+            "registry": {
+                "schema": "complex_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "nested.example.com",
+            "port": 5432,
+            "database_name": "deep_nested"
+        },
+        "user_service": {
+            "$reference": {
+                "registry": {
+                    "schema": "user_service",
+                    "version": "1.0.0"
+                }
+            },
+            "database": {
+                "$reference": {
+                    "registry": {
+                        "schema": "database_service",
+                        "version": "1.0.0"
+                    }
+                },
+                "host": "user.example.com",
+                "port": 3306,
+                "database_name": "users"
+            },
+            "cache_enabled": true
+        },
+        "config": {
+            "level1": {
+                "level2": {
+                    "level3": "deep_value"
+                }
+            }
+        }
+    }
+}

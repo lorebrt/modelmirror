@@ -1,0 +1,22 @@
+{
+    "service_1": {
+        "$reference": {
+            "registry": {
+                "schema": "simple_service",
+                "version": "1.0.0"
+            },
+            "instance": "duplicate"
+        },
+        "name": "first"
+    },
+    "service_2": {
+        "$reference": {
+            "registry": {
+                "schema": "simple_service",
+                "version": "1.0.0"
+            },
+            "instance": "duplicate"
+        },
+        "name": "second"
+    }
+}

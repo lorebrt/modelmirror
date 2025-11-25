@@ -1,0 +1,14 @@
+{
+    "database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            },
+            "instance": "main_db"
+        },
+        "host": "localhost",
+        "port": 5432,
+        "database_name": "maindb"
+    }
+}

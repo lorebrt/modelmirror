@@ -1,0 +1,12 @@
+{
+    "service": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": "$nonexistent_db",
+        "cache_enabled": true
+    }
+}

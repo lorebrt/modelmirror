@@ -1,0 +1,24 @@
+{
+    "database": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            },
+            "instance": "shared_db"
+        },
+        "host": "localhost",
+        "port": 5432,
+        "database_name": "appdb"
+    },
+    "user_service": {
+        "$reference": {
+            "registry": {
+                "schema": "user_service",
+                "version": "1.0.0"
+            }
+        },
+        "database": "$shared_db",
+        "cache_enabled": true
+    }
+}

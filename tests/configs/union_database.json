@@ -1,0 +1,35 @@
+{
+    "service": {
+        "$reference": {
+            "registry": {
+                "schema": "database_service",
+                "version": "1.0.0"
+            }
+        },
+        "host": "localhost",
+        "port": 5432,
+        "database_name": "union_db"
+    },
+    "services": [
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "database_service",
+                    "version": "1.0.0"
+                }
+            },
+            "host": "db1.example.com",
+            "port": 5432,
+            "database_name": "db1"
+        },
+        {
+            "$reference": {
+                "registry": {
+                    "schema": "simple_service",
+                    "version": "1.0.0"
+                }
+            },
+            "name": "mixed_service"
+        }
+    ]
+}
