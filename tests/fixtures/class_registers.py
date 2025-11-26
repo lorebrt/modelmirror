@@ -13,56 +13,45 @@ from tests.fixtures.test_classes import (
 )
 
 
-class SimpleServiceRegister(ClassRegister, 
-    reference=ClassReference(id="simple_service", cls=SimpleService)):
-    pass
+class SimpleServiceRegister(ClassRegister):
+    reference = ClassReference(id="simple_service", cls=SimpleService)
 
 
-class DatabaseServiceRegister(ClassRegister,
-    reference=ClassReference(id="database_service", cls=DatabaseService)):
-    pass
+class DatabaseServiceRegister(ClassRegister):
+    reference = ClassReference(id="database_service", cls=DatabaseService)
 
 
-class UserServiceRegister(ClassRegister,
-    reference=ClassReference(id="user_service", cls=UserService)):
-    pass
+class UserServiceRegister(ClassRegister):
+    reference = ClassReference(id="user_service", cls=UserService)
 
 
-class ConfigurableServiceRegister(ClassRegister,
-    reference=ClassReference(id="configurable_service", cls=ConfigurableService)):
-    pass
+class ConfigurableServiceRegister(ClassRegister):
+    reference = ClassReference(id="configurable_service", cls=ConfigurableService)
 
 
-class ComplexServiceRegister(ClassRegister,
-    reference=ClassReference(id="complex_service", cls=ComplexService)):
-    pass
+class ComplexServiceRegister(ClassRegister):
+    reference = ClassReference(id="complex_service", cls=ComplexService)
 
 
-class ServiceWithDefaultsRegister(ClassRegister,
-    reference=ClassReference(id="service_with_defaults", cls=ServiceWithDefaults)):
-    pass
+class ServiceWithDefaultsRegister(ClassRegister):
+    reference = ClassReference(id="service_with_defaults", cls=ServiceWithDefaults)
 
 
-class ServiceWithOptionalsRegister(ClassRegister,
-    reference=ClassReference(id="service_with_optionals", cls=ServiceWithOptionals)):
-    pass
+class ServiceWithOptionalsRegister(ClassRegister):
+    reference = ClassReference(id="service_with_optionals", cls=ServiceWithOptionals)
 
 
-class ListServiceRegister(ClassRegister,
-    reference=ClassReference(id="list_service", cls=ListService)):
-    pass
+class ListServiceRegister(ClassRegister):
+    reference = ClassReference(id="list_service", cls=ListService)
 
 
-class DictServiceRegister(ClassRegister,
-    reference=ClassReference(id="dict_service", cls=DictService)):
-    pass
+class DictServiceRegister(ClassRegister):
+    reference = ClassReference(id="dict_service", cls=DictService)
 
 
-class NestedServiceRegister(ClassRegister,
-    reference=ClassReference(id="nested_service", cls=NestedService)):
-    pass
+class NestedServiceRegister(ClassRegister):
+    reference = ClassReference(id="nested_service", cls=NestedService)
 
 
-class ValidationServiceRegister(ClassRegister,
-    reference=ClassReference(id="validation_service", cls=ValidationService)):
-    pass
+class ValidationServiceRegister(ClassRegister):
+    reference = ClassReference(id="validation_service", cls=ValidationService)
