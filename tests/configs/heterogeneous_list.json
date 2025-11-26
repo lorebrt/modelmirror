@@ -1,27 +1,19 @@
 {
     "mixed_services": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "simple"
         },
         {
-            "$reference": {
-                "registry": {"id": "database_service"}
-            },
+            "$reference": "database_service",
             "host": "localhost",
             "port": 5432,
             "database_name": "mixed_db"
         },
         {
-            "$reference": {
-                "registry": {"id": "user_service"}
-            },
+            "$reference": "user_service",
             "database": {
-                "$reference": {
-                    "registry": {"id": "database_service"}
-                },
+                "$reference": "database_service",
                 "host": "user_host",
                 "port": 3306,
                 "database_name": "users"

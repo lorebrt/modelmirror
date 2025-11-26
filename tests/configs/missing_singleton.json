@@ -1,8 +1,6 @@
 {
     "service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$nonexistent_db",
         "cache_enabled": true
     }

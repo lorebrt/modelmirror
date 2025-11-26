@@ -1,16 +1,11 @@
 {
     "services": {
         "primary": {
-            "$reference": {
-                "registry": {"id": "simple_service"},
-                "instance": "main_service"
-            },
+            "$reference": "simple_service:main_service",
             "name": "main"
         },
         "secondary": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "secondary"
         },
         "backup": "$main_service"

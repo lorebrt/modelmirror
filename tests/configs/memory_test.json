@@ -1,31 +1,22 @@
 {
     "shared_db": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "shared_database"
-        },
+        "$reference": "database_service:shared_database",
         "host": "shared.db.example.com",
         "port": 5432,
         "database_name": "shared"
     },
     "service_1": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$shared_database",
         "cache_enabled": true
     },
     "service_2": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$shared_database",
         "cache_enabled": false
     },
     "service_3": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$shared_database",
         "cache_enabled": true
     }

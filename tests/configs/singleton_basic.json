@@ -1,9 +1,6 @@
 {
     "database": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "main_db"
-        },
+        "$reference": "database_service:main_db",
         "host": "localhost",
         "port": 5432,
         "database_name": "maindb"

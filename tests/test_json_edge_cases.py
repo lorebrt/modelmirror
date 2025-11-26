@@ -102,10 +102,7 @@ class TestJSONEdgeCases(unittest.TestCase):
         with open('tests/configs/valid_numeric_singleton.json', 'w') as f:
             json.dump({
                 "service1": {
-                    "$reference": {
-                        "registry": {"id": "simple_service"},
-                        "instance": "123"
-                    },
+                    "$reference": "simple_service:123",
                     "name": "numeric_singleton"
                 }
             }, f)

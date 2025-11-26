@@ -1,49 +1,35 @@
 {
     "load_balancer_db": {
-        "$reference": {
-            "registry": {"id": "database_service"}
-        },
+        "$reference": "database_service",
         "host": "lb.db.example.com",
         "port": 5432,
         "database_name": "load_balancer"
     },
     "shard_db": {
-        "$reference": {
-            "registry": {"id": "database_service"}
-        },
+        "$reference": "database_service",
         "host": "shard.db.example.com",
         "port": 5432,
         "database_name": "shard_1"
     },
     "worker_services": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "worker_1"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "worker_2"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "worker_3"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "worker_4"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "worker_5"
         }
     ]

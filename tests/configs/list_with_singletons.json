@@ -1,16 +1,11 @@
 {
     "services": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"},
-                "instance": "shared_service"
-            },
+            "$reference": "simple_service:shared_service",
             "name": "shared"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "unique"
         },
         "$shared_service"

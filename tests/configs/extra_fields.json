@@ -1,9 +1,6 @@
 {
     "service": {
-        "$reference": {
-            "registry": {"id": "simple_service"},
-            "unexpected_field": "should_be_ignored"
-        },
+        "$reference": "simple_service",
         "name": "test"
     }
 }

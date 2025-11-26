@@ -1,8 +1,6 @@
 {
     "service": {
-        "$reference": {
-            "registry": {"id": "validation_service"}
-        },
+        "$reference": "validation_service",
         "name": "test_service",
         "port": 8080,
         "enabled": true

@@ -1,28 +1,20 @@
 {
     "primary_database": {
-        "$reference": {
-            "registry": {"id": "database_service"}
-        },
+        "$reference": "database_service",
         "host": "valid.db.example.com",
         "port": 5432,
         "database_name": "valid_app"
     },
     "secondary_database": {
-        "$reference": {
-            "registry": {"id": "database_service"}
-        },
+        "$reference": "database_service",
         "host": "valid-secondary.db.example.com",
         "port": 5432,
         "database_name": "valid_secondary"
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": {
-            "$reference": {
-                "registry": {"id": "database_service"}
-            },
+            "$reference": "database_service",
             "host": "user.db.example.com",
             "port": 5432,
             "database_name": "users"
@@ -31,40 +23,28 @@
     },
     "microservices": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "valid_service"
         }
     ],
     "service_registry": {
         "main": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "main_service"
         }
     },
     "orchestrator": {
-        "$reference": {
-            "registry": {"id": "complex_service"}
-        },
+        "$reference": "complex_service",
         "database": {
-            "$reference": {
-                "registry": {"id": "database_service"}
-            },
+            "$reference": "database_service",
             "host": "orchestrator.db.example.com",
             "port": 5432,
             "database_name": "orchestrator"
         },
         "user_service": {
-            "$reference": {
-                "registry": {"id": "user_service"}
-            },
+            "$reference": "user_service",
             "database": {
-                "$reference": {
-                    "registry": {"id": "database_service"}
-                },
+                "$reference": "database_service",
                 "host": "orch-user.db.example.com",
                 "port": 5432,
                 "database_name": "orch_users"

@@ -1,46 +1,32 @@
 {
     "auth_db": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "auth_database"
-        },
+        "$reference": "database_service:auth_database",
         "host": "auth.db.example.com",
         "port": 5432,
         "database_name": "auth_service"
     },
     "user_db": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "user_database"
-        },
+        "$reference": "database_service:user_database",
         "host": "user.db.example.com",
         "port": 5432,
         "database_name": "user_service"
     },
     "auth_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$auth_database",
         "cache_enabled": true
     },
     "service_registry": {
         "auth": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "auth_microservice"
         },
         "notifications": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "notification_microservice"
         },
         "payments": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "payment_microservice"
         }
     }

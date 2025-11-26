@@ -8,7 +8,8 @@ from modelmirror.class_provider.class_reference import ClassReference
 from modelmirror.class_provider.class_scanner import ClassScanner
 from modelmirror.instance.instance_properties import InstanceProperties
 from modelmirror.instance.reference_service import ReferenceService
-from modelmirror.reflection.reflection_metadata import ReflectionMetadata
+from modelmirror.parser.default_reference_parser import DefaultReferenceParser
+from modelmirror.parser.reference_parser import ReferenceParser
 from modelmirror.reflections import Reflections
 from modelmirror.utils import json_utils
 
@@ -16,11 +17,12 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class Mirror:
-    def __init__(self, package_name: str = "app"):
+    def __init__(self, package_name: str = "app", reference_parser: ReferenceParser = DefaultReferenceParser()):
         self.__registered_classes: list[ClassReference] = ClassScanner(package_name).scan()
         self.__instance_properties: dict[str, InstanceProperties] = {}
         self.__reference_service = ReferenceService()
         self.__singleton_path: dict[str, str] = {}
+        self.__reference_parser = reference_parser
 
     def reflect_typed(self, config_path: str, model: type[T]) -> T:
         self.__auto_reset()
@@ -95,12 +97,13 @@ class Mirror:
 
         if isinstance(node, dict) and "$reference" in node:
             node_id = node_context.path_str
-            reflection_metadata = ReflectionMetadata(**node.pop("$reference"))
+            raw_reference = node.pop("$reference")
             params: dict[str, Any] = {name: prop for name, prop in node.items()}
             refs = self.__reference_service.find(list(params.values()))
-            instance = reflection_metadata.instance
 
-            class_reference = self.__get_class_reference(reflection_metadata.registry.id)
+            reference = self.__reference_parser.parse(raw_reference)
+            instance = reference.instance
+            class_reference = self.__get_class_reference(reference.id)
 
             self.__instance_properties[node_id] = InstanceProperties(
                 node_id,

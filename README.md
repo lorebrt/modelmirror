@@ -64,17 +64,12 @@ Create a `config.json` file that defines your instances:
 ```json
 {
     "my_database": {
-        "$reference": {
-            "registry": {"id": "database"},
-            "instance": "db_singleton"
-        },
+        "$reference": "database:db_singleton",
         "host": "localhost",
         "port": 5432
     },
     "my_user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "db": "$db_singleton",
         "cache_enabled": true
     }
@@ -121,14 +116,12 @@ ModelMirror's power comes from its reference system. Let's explore how it works 
 
 ### Basic Reference Structure
 
-Every object in your JSON you want to mirror needs a `$reference` block:
+Every object in your JSON you want to mirror needs a `$reference` field with a simple string:
 
 ```json
 {
     "my_service": {
-        "$reference": {
-            "registry": {"id": "service"}
-        },
+        "$reference": "service",
         "name": "My Service"
     }
 }
@@ -140,28 +133,21 @@ This tells ModelMirror:
 
 ### Singleton References - Reuse Instances Anywhere
 
-Add an `instance` field to create a reusable singleton:
+Use the format `"id:instance_name"` to create a reusable singleton:
 
 ```json
 {
     "database": {
-        "$reference": {
-            "registry": {"id": "database"},
-            "instance": "main_db"
-        },
+        "$reference": "database:main_db",
         "host": "localhost",
         "port": 5432
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$main_db"
     },
     "admin_service": {
-        "$reference": {
-            "registry": {"id": "admin_service"}
-        },
+        "$reference": "admin_service",
         "database": "$main_db"
     }
 }
@@ -194,25 +180,18 @@ ModelMirror handles lists and dictionaries seamlessly.
 ```json
 {
     "primary_db": {
-        "$reference": {
-            "registry": {"id": "database"},
-            "instance": "primary"
-        },
+        "$reference": "database:primary",
         "host": "primary.db.com",
         "port": 5432
     },
     "services": [
         {
-            "$reference": {
-                "registry": {"id": "service"}
-            },
+            "$reference": "service",
             "name": "Service 1",
             "database": "$primary"
         },
         {
-            "$reference": {
-                "registry": {"id": "service"}
-            },
+            "$reference": "service",
             "name": "Service 2",
             "database": "$primary"
         }
@@ -242,26 +221,18 @@ print(f"Loaded {len(config.services)} services")
 {
     "databases": {
         "primary": {
-            "$reference": {
-                "registry": {"id": "database"},
-                "instance": "primary_db"
-            },
+            "$reference": "database:primary_db",
             "host": "primary.db.com",
             "port": 5432
         },
         "secondary": {
-            "$reference": {
-                "registry": {"id": "database"},
-                "instance": "secondary_db"
-            },
+            "$reference": "database:secondary_db",
             "host": "secondary.db.com",
             "port": 5432
         }
     },
     "load_balancer": {
-        "$reference": {
-            "registry": {"id": "load_balancer"}
-        },
+        "$reference": "load_balancer",
         "primary_db": "$primary_db",
         "secondary_db": "$secondary_db"
     }
@@ -293,33 +264,22 @@ ModelMirror handles deeply nested configurations effortlessly.
 ```json
 {
     "cache": {
-        "$reference": {
-            "registry": {"id": "cache"},
-            "instance": "redis_cache"
-        },
+        "$reference": "cache:redis_cache",
         "host": "redis.internal",
         "port": 6379
     },
     "database": {
-        "$reference": {
-            "registry": {"id": "database"},
-            "instance": "postgres_db"
-        },
+        "$reference": "database:postgres_db",
         "host": "postgres.internal",
         "port": 5432
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"},
-            "instance": "user_svc"
-        },
+        "$reference": "user_service:user_svc",
         "database": "$postgres_db",
         "cache": "$redis_cache"
     },
     "notification_service": {
-        "$reference": {
-            "registry": {"id": "notification_service"}
-        },
+        "$reference": "notification_service",
         "user_service": "$user_svc",
         "templates": {
             "email": "Welcome {{name}}!",
@@ -353,17 +313,12 @@ config = mirror.reflect_typed('config.json', AppConfig)
 {
     "microservices": {
         "auth": {
-            "$reference": {
-                "registry": {"id": "auth_service"},
-                "instance": "auth"
-            },
+            "$reference": "auth_service:auth",
             "jwt_secret": "secret123",
             "token_expiry": 3600
         },
         "api_gateway": {
-            "$reference": {
-                "registry": {"id": "gateway"}
-            },
+            "$reference": "gateway",
             "auth_service": "$auth",
             "routes": [
                 {

@@ -1,13 +1,19 @@
 {
     "complex_structure": {
         "arrays": [
-            [1, 2, 3],
-            ["a", "b", "c"],
+            [
+                1,
+                2,
+                3
+            ],
+            [
+                "a",
+                "b",
+                "c"
+            ],
             [
                 {
-                    "$reference": {
-                        "registry": {"id": "simple_service"}
-                    },
+                    "$reference": "simple_service",
                     "name": "nested_in_array"
                 }
             ]
@@ -17,9 +23,7 @@
                 "level2": {
                     "services": [
                         {
-                            "$reference": {
-                                "registry": {"id": "simple_service"}
-                            },
+                            "$reference": "simple_service",
                             "name": "deeply_nested"
                         }
                     ]

@@ -1,24 +1,16 @@
 {
     "core_system": {
-        "$reference": {
-            "registry": {"id": "complex_service"}
-        },
+        "$reference": "complex_service",
         "database": {
-            "$reference": {
-                "registry": {"id": "database_service"}
-            },
+            "$reference": "database_service",
             "host": "core.db.example.com",
             "port": 5432,
             "database_name": "core_system"
         },
         "user_service": {
-            "$reference": {
-                "registry": {"id": "user_service"}
-            },
+            "$reference": "user_service",
             "database": {
-                "$reference": {
-                    "registry": {"id": "database_service"}
-                },
+                "$reference": "database_service",
                 "host": "users.db.example.com",
                 "port": 5432,
                 "database_name": "users"
@@ -31,21 +23,15 @@
     },
     "plugins": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "auth_plugin"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "logging_plugin"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "metrics_plugin"
         }
     ]

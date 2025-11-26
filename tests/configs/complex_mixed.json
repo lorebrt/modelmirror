@@ -1,41 +1,29 @@
 {
     "database": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "main_database"
-        },
+        "$reference": "database_service:main_database",
         "host": "localhost",
         "port": 5432,
         "database_name": "app_db"
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$main_database",
         "cache_enabled": true
     },
     "services": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"},
-                "instance": "primary_service"
-            },
+            "$reference": "simple_service:primary_service",
             "name": "primary"
         },
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "secondary"
         }
     ],
     "service_map": {
         "primary": "$primary_service",
         "backup": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "backup"
         }
     }

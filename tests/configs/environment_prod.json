@@ -1,53 +1,38 @@
 {
     "primary_database": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "primary_db"
-        },
+        "$reference": "database_service:primary_db",
         "host": "prod.db.example.com",
         "port": 5432,
         "database_name": "app_prod"
     },
     "secondary_database": {
-        "$reference": {
-            "registry": {"id": "database_service"}
-        },
+        "$reference": "database_service",
         "host": "prod-secondary.db.example.com",
         "port": 5432,
         "database_name": "app_prod_secondary"
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$primary_db",
         "cache_enabled": true
     },
     "microservices": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "prod_service_1"
         }
     ],
     "service_registry": {
         "main": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "main_service"
         }
     },
     "orchestrator": {
-        "$reference": {
-            "registry": {"id": "complex_service"}
-        },
+        "$reference": "complex_service",
         "database": "$primary_db",
         "user_service": {
-            "$reference": {
-                "registry": {"id": "user_service"}
-            },
+            "$reference": "user_service",
             "database": "$primary_db",
             "cache_enabled": true
         },

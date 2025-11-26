@@ -1,49 +1,35 @@
 {
     "primary_database": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "primary_db"
-        },
+        "$reference": "database_service:primary_db",
         "host": "composition.db.example.com",
         "port": 5432,
         "database_name": "composition"
     },
     "secondary_database": {
-        "$reference": {
-            "registry": {"id": "database_service"}
-        },
+        "$reference": "database_service",
         "host": "composition-secondary.db.example.com",
         "port": 5432,
         "database_name": "composition_secondary"
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"},
-            "instance": "main_user_service"
-        },
+        "$reference": "user_service:main_user_service",
         "database": "$primary_db",
         "cache_enabled": true
     },
     "microservices": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "composition_service"
         }
     ],
     "service_registry": {
         "main": {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "main_service"
         }
     },
     "orchestrator": {
-        "$reference": {
-            "registry": {"id": "complex_service"}
-        },
+        "$reference": "complex_service",
         "database": "$primary_db",
         "user_service": "$main_user_service",
         "config": {

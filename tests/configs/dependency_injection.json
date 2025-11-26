@@ -1,17 +1,12 @@
 {
     "database": {
-        "$reference": {
-            "registry": {"id": "database_service"},
-            "instance": "shared_db"
-        },
+        "$reference": "database_service:shared_db",
         "host": "localhost",
         "port": 5432,
         "database_name": "appdb"
     },
     "user_service": {
-        "$reference": {
-            "registry": {"id": "user_service"}
-        },
+        "$reference": "user_service",
         "database": "$shared_db",
         "cache_enabled": true
     }

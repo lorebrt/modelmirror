@@ -1,21 +1,15 @@
 {
     "service": {
-        "$reference": {
-            "registry": {"id": "simple_service"}
-        },
+        "$reference": "simple_service",
         "name": "discriminated_service"
     },
     "services": [
         {
-            "$reference": {
-                "registry": {"id": "simple_service"}
-            },
+            "$reference": "simple_service",
             "name": "union_service_1"
         },
         {
-            "$reference": {
-                "registry": {"id": "database_service"}
-            },
+            "$reference": "database_service",
             "host": "union.db.example.com",
             "port": 5432,
             "database_name": "union_db"

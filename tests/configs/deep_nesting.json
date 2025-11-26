@@ -1,24 +1,16 @@
 {
     "complex_service": {
-        "$reference": {
-            "registry": {"id": "complex_service"}
-        },
+        "$reference": "complex_service",
         "database": {
-            "$reference": {
-                "registry": {"id": "database_service"}
-            },
+            "$reference": "database_service",
             "host": "nested.example.com",
             "port": 5432,
             "database_name": "deep_nested"
         },
         "user_service": {
-            "$reference": {
-                "registry": {"id": "user_service"}
-            },
+            "$reference": "user_service",
             "database": {
-                "$reference": {
-                    "registry": {"id": "database_service"}
-                },
+                "$reference": "database_service",
                 "host": "user.example.com",
                 "port": 3306,
                 "database_name": "users"

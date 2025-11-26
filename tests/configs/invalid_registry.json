@@ -1,8 +1,6 @@
 {
     "service": {
-        "$reference": {
-            "registry": {"id": "nonexistent_service"}
-        },
+        "$reference": "nonexistent_service",
         "name": "test"
     }
 }

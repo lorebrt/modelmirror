@@ -1,8 +1,6 @@
 {
     "service": {
-        "$reference": {
-            "registry": {"id": "simple_service"}
-        },
-        "name": "测试服务_🚀_special-chars.test@domain.com"
+        "$reference": "simple_service",
+        "name": "\u6d4b\u8bd5\u670d\u52a1_\ud83d\ude80_special-chars.test@domain.com"
     }
 }

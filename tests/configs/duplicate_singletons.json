@@ -1,16 +1,10 @@
 {
     "service_1": {
-        "$reference": {
-            "registry": {"id": "simple_service"},
-            "instance": "duplicate"
-        },
+        "$reference": "simple_service:duplicate",
         "name": "first"
     },
     "service_2": {
-        "$reference": {
-            "registry": {"id": "simple_service"},
-            "instance": "duplicate"
-        },
+        "$reference": "simple_service:duplicate",
         "name": "second"
     }
 }
