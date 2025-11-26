@@ -1,6 +1,6 @@
 {
     "service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$nonexistent_db",
         "cache_enabled": true
     }

@@ -17,12 +17,18 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class Mirror:
-    def __init__(self, package_name: str = "app", reference_parser: ReferenceParser = DefaultReferenceParser()):
+    def __init__(
+        self,
+        package_name: str = "app",
+        parser: ReferenceParser = DefaultReferenceParser(),
+        placeholder: str = "$mirror",
+    ):
         self.__registered_classes: list[ClassReference] = ClassScanner(package_name).scan()
         self.__instance_properties: dict[str, InstanceProperties] = {}
         self.__reference_service = ReferenceService()
         self.__singleton_path: dict[str, str] = {}
-        self.__reference_parser = reference_parser
+        self.__parser = parser
+        self.__placeholder = placeholder
 
     def reflect(self, config_path: str, model: type[T]) -> T:
         self.__auto_reset()
@@ -95,13 +101,13 @@ class Mirror:
     def __create_instance_map(self, node_context: json_utils.NodeContext):
         node = node_context.node
 
-        if isinstance(node, dict) and "$reference" in node:
+        if isinstance(node, dict) and self.__placeholder in node:
             node_id = node_context.path_str
-            raw_reference = node.pop("$reference")
+            raw_reference = node.pop(self.__placeholder)
             params: dict[str, Any] = {name: prop for name, prop in node.items()}
             refs = self.__reference_service.find(list(params.values()))
 
-            reference = self.__reference_parser.parse(raw_reference)
+            reference = self.__parser.parse(raw_reference)
             instance = reference.instance
             class_reference = self.__get_class_reference(reference.id)
 

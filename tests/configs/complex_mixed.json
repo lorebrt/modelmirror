@@ -1,29 +1,29 @@
 {
     "database": {
-        "$reference": "database_service:main_database",
+        "$mirror": "database_service:main_database",
         "host": "localhost",
         "port": 5432,
         "database_name": "app_db"
     },
     "user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$main_database",
         "cache_enabled": true
     },
     "services": [
         {
-            "$reference": "simple_service:primary_service",
+            "$mirror": "simple_service:primary_service",
             "name": "primary"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "secondary"
         }
     ],
     "service_map": {
         "primary": "$primary_service",
         "backup": {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "backup"
         }
     }

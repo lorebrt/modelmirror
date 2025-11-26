@@ -1,42 +1,42 @@
 {
     "primary_database": {
-        "$reference": "database_service:primary_db",
+        "$mirror": "database_service:primary_db",
         "host": "large.db.example.com",
         "port": 5432,
         "database_name": "large_app"
     },
     "secondary_database": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "large-secondary.db.example.com",
         "port": 5432,
         "database_name": "large_secondary"
     },
     "user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$primary_db",
         "cache_enabled": true
     },
     "microservices": [
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "service_1"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "service_2"
         }
     ],
     "service_registry": {
         "main": {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "main_service"
         }
     },
     "orchestrator": {
-        "$reference": "complex_service",
+        "$mirror": "complex_service",
         "database": "$primary_db",
         "user_service": {
-            "$reference": "user_service",
+            "$mirror": "user_service",
             "database": "$primary_db",
             "cache_enabled": true
         },

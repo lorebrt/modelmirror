@@ -1,15 +1,15 @@
 {
     "services": [
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "first"
         },
         {
-            "$reference": "simple_service:reused",
+            "$mirror": "simple_service:reused",
             "name": "second"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "third"
         },
         "$reused"

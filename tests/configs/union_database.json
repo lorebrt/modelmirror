@@ -1,19 +1,19 @@
 {
     "service": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "localhost",
         "port": 5432,
         "database_name": "union_db"
     },
     "services": [
         {
-            "$reference": "database_service",
+            "$mirror": "database_service",
             "host": "db1.example.com",
             "port": 5432,
             "database_name": "db1"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "mixed_service"
         }
     ]

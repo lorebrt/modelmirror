@@ -1,16 +1,16 @@
 {
     "complex_service": {
-        "$reference": "complex_service",
+        "$mirror": "complex_service",
         "database": {
-            "$reference": "database_service",
+            "$mirror": "database_service",
             "host": "nested.example.com",
             "port": 5432,
             "database_name": "deep_nested"
         },
         "user_service": {
-            "$reference": "user_service",
+            "$mirror": "user_service",
             "database": {
-                "$reference": "database_service",
+                "$mirror": "database_service",
                 "host": "user.example.com",
                 "port": 3306,
                 "database_name": "users"

@@ -1,22 +1,22 @@
 {
     "shared_db": {
-        "$reference": "database_service:shared_database",
+        "$mirror": "database_service:shared_database",
         "host": "shared.db.example.com",
         "port": 5432,
         "database_name": "shared"
     },
     "service_1": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$shared_database",
         "cache_enabled": true
     },
     "service_2": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$shared_database",
         "cache_enabled": false
     },
     "service_3": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$shared_database",
         "cache_enabled": true
     }

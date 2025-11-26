@@ -1,8 +1,10 @@
 {
     // This is a comment
     "service": {
-        "$reference": {
-            "registry": {"id": "simple_service"}
+        "$mirror": {
+            "registry": {
+                "id": "simple_service"
+            }
         },
         "name": "test" /* inline comment */
     }

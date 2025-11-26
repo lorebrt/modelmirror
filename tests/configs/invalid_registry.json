@@ -1,6 +1,6 @@
 {
     "service": {
-        "$reference": "nonexistent_service",
+        "$mirror": "nonexistent_service",
         "name": "test"
     }
 }

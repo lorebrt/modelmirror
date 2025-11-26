@@ -64,12 +64,12 @@ Create a `config.json` file that defines your instances:
 ```json
 {
     "my_database": {
-        "$reference": "database:db_singleton",
+        "$mirror": "database:db_singleton",
         "host": "localhost",
         "port": 5432
     },
     "my_user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "db": "$db_singleton",
         "cache_enabled": true
     }
@@ -112,11 +112,11 @@ print(config.my_database.host)  # Full autocomplete!
 
 ## Tutorial 3: Understanding References - The Heart of ModelMirror
 
-ModelMirror's power comes from its reference system. The `$reference` field is what transforms JSON objects into live instances.
+ModelMirror's power comes from its reference system. The `$mirror` field is what transforms JSON objects into live instances.
 
-### How `$reference` Works
+### How `$mirror` Works
 
-The `$reference` field uses a simple string format that ModelMirror parses to understand:
+The `$mirror` field uses a simple string format that ModelMirror parses to understand:
 1. **Which class to instantiate** (the registered ID)
 2. **Whether to create a singleton** (optional instance name)
 
@@ -124,12 +124,12 @@ The `$reference` field uses a simple string format that ModelMirror parses to un
 
 ### Basic Reference Structure
 
-Every object you want to mirror needs a `$reference` field:
+Every object you want to mirror needs a `$mirror` field:
 
 ```json
 {
     "my_service": {
-        "$reference": "service",
+        "$mirror": "service",
         "name": "My Service"
     }
 }
@@ -147,16 +147,16 @@ Add `:instance_name` to create a reusable singleton:
 ```json
 {
     "database": {
-        "$reference": "database:main_db",
+        "$mirror": "database:main_db",
         "host": "localhost",
         "port": 5432
     },
     "user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$main_db"
     },
     "admin_service": {
-        "$reference": "admin_service",
+        "$mirror": "admin_service",
         "database": "$main_db"
     }
 }
@@ -169,7 +169,7 @@ Add `:instance_name` to create a reusable singleton:
 
 ### Reference Parser Architecture
 
-ModelMirror uses a pluggable parser system to handle `$reference` strings:
+ModelMirror uses a pluggable parser system to handle `$mirror` strings:
 
 ```python
 from modelmirror.parser.reference_parser import ReferenceParser
@@ -230,18 +230,18 @@ ModelMirror handles lists and dictionaries seamlessly.
 ```json
 {
     "primary_db": {
-        "$reference": "database:primary",
+        "$mirror": "database:primary",
         "host": "primary.db.com",
         "port": 5432
     },
     "services": [
         {
-            "$reference": "service",
+            "$mirror": "service",
             "name": "Service 1",
             "database": "$primary"
         },
         {
-            "$reference": "service",
+            "$mirror": "service",
             "name": "Service 2",
             "database": "$primary"
         }
@@ -271,18 +271,18 @@ print(f"Loaded {len(config.services)} services")
 {
     "databases": {
         "primary": {
-            "$reference": "database:primary_db",
+            "$mirror": "database:primary_db",
             "host": "primary.db.com",
             "port": 5432
         },
         "secondary": {
-            "$reference": "database:secondary_db",
+            "$mirror": "database:secondary_db",
             "host": "secondary.db.com",
             "port": 5432
         }
     },
     "load_balancer": {
-        "$reference": "load_balancer",
+        "$mirror": "load_balancer",
         "primary_db": "$primary_db",
         "secondary_db": "$secondary_db"
     }
@@ -314,22 +314,22 @@ ModelMirror handles deeply nested configurations effortlessly.
 ```json
 {
     "cache": {
-        "$reference": "cache:redis_cache",
+        "$mirror": "cache:redis_cache",
         "host": "redis.internal",
         "port": 6379
     },
     "database": {
-        "$reference": "database:postgres_db",
+        "$mirror": "database:postgres_db",
         "host": "postgres.internal",
         "port": 5432
     },
     "user_service": {
-        "$reference": "user_service:user_svc",
+        "$mirror": "user_service:user_svc",
         "database": "$postgres_db",
         "cache": "$redis_cache"
     },
     "notification_service": {
-        "$reference": "notification_service",
+        "$mirror": "notification_service",
         "user_service": "$user_svc",
         "templates": {
             "email": "Welcome {{name}}!",
@@ -363,12 +363,12 @@ config = mirror.reflect('config.json', AppConfig)
 {
     "microservices": {
         "auth": {
-            "$reference": "auth_service:auth",
+            "$mirror": "auth_service:auth",
             "jwt_secret": "secret123",
             "token_expiry": 3600
         },
         "api_gateway": {
-            "$reference": "gateway",
+            "$mirror": "gateway",
             "auth_service": "$auth",
             "routes": [
                 {
@@ -475,9 +475,9 @@ mirror = Mirror('myapp', reference_parser=VersionedReferenceParser())
 ### 1. Use Meaningful Singleton Names
 ```json
 {
-    "$reference": "database:user_db"     // Good: descriptive
-    "$reference": "cache:cache_1"       // Good: clear purpose
-    "$reference": "service:x"           // Bad: unclear
+    "$mirror": "database:user_db"     // Good: descriptive
+    "$mirror": "cache:cache_1"       // Good: clear purpose
+    "$mirror": "service:x"           // Bad: unclear
 }
 ```
 
@@ -486,19 +486,19 @@ mirror = Mirror('myapp', reference_parser=VersionedReferenceParser())
 {
     // Simple instance - no reuse needed
     "logger": {
-        "$reference": "logger",
+        "$mirror": "logger",
         "level": "INFO"
     },
 
     // Singleton - will be reused
     "database": {
-        "$reference": "database:main_db",
+        "$mirror": "database:main_db",
         "host": "localhost"
     },
 
     // Reference the singleton
     "user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$main_db"  // Inject the singleton
     }
 }
@@ -511,15 +511,15 @@ ModelMirror automatically resolves dependencies using topological sorting:
 ```json
 {
     "user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": "$main_db",     // Depends on main_db
         "cache": "$redis"           // Depends on redis
     },
     "database": {
-        "$reference": "database:main_db"  // Created first
+        "$mirror": "database:main_db"  // Created first
     },
     "cache": {
-        "$reference": "cache:redis"       // Created second
+        "$mirror": "cache:redis"       // Created second
     }
     // user_service created last (after dependencies)
 }

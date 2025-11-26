@@ -1,6 +1,6 @@
 {
     "service": {
-        "$reference": "validation_service",
+        "$mirror": "validation_service",
         "name": "custom_validation_service",
         "port": 8080,
         "enabled": true

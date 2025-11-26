@@ -1,35 +1,35 @@
 {
     "load_balancer_db": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "lb.db.example.com",
         "port": 5432,
         "database_name": "load_balancer"
     },
     "shard_db": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "shard.db.example.com",
         "port": 5432,
         "database_name": "shard_1"
     },
     "worker_services": [
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "worker_1"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "worker_2"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "worker_3"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "worker_4"
         },
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "worker_5"
         }
     ]

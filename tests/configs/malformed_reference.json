@@ -1,6 +1,6 @@
 {
     "service": {
-        "$reference": {
+        "$mirror": {
             "invalid_field": "value"
         },
         "name": "test"

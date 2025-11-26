@@ -1,11 +1,11 @@
 {
     "services": {
         "primary": {
-            "$reference": "simple_service:main_service",
+            "$mirror": "simple_service:main_service",
             "name": "main"
         },
         "secondary": {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "secondary"
         },
         "backup": "$main_service"

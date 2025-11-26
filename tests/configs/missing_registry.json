@@ -1,6 +1,6 @@
 {
     "service": {
-        "$reference": {
+        "$mirror": {
             "instance": "test_instance"
         },
         "name": "test"

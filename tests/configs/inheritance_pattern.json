@@ -1,14 +1,14 @@
 {
     "complex_service": {
-        "$reference": "complex_service",
+        "$mirror": "complex_service",
         "database": {
-            "$reference": "database_service:base_db",
+            "$mirror": "database_service:base_db",
             "host": "base.example.com",
             "port": 5432,
             "database_name": "base_db"
         },
         "user_service": {
-            "$reference": "user_service",
+            "$mirror": "user_service",
             "database": "$base_db",
             "cache_enabled": true
         },

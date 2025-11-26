@@ -1,35 +1,35 @@
 {
     "primary_database": {
-        "$reference": "database_service:primary_db",
+        "$mirror": "database_service:primary_db",
         "host": "composition.db.example.com",
         "port": 5432,
         "database_name": "composition"
     },
     "secondary_database": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "composition-secondary.db.example.com",
         "port": 5432,
         "database_name": "composition_secondary"
     },
     "user_service": {
-        "$reference": "user_service:main_user_service",
+        "$mirror": "user_service:main_user_service",
         "database": "$primary_db",
         "cache_enabled": true
     },
     "microservices": [
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "composition_service"
         }
     ],
     "service_registry": {
         "main": {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "main_service"
         }
     },
     "orchestrator": {
-        "$reference": "complex_service",
+        "$mirror": "complex_service",
         "database": "$primary_db",
         "user_service": "$main_user_service",
         "config": {

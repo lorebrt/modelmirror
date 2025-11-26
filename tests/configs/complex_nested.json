@@ -13,7 +13,7 @@
             ],
             [
                 {
-                    "$reference": "simple_service",
+                    "$mirror": "simple_service",
                     "name": "nested_in_array"
                 }
             ]
@@ -23,7 +23,7 @@
                 "level2": {
                     "services": [
                         {
-                            "$reference": "simple_service",
+                            "$mirror": "simple_service",
                             "name": "deeply_nested"
                         }
                     ]

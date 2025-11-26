@@ -1,8 +1,8 @@
 {
     "service": {
-        "$reference": "configurable_service",
+        "$mirror": "configurable_service",
         "service": {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "valid_service"
         },
         "timeout": 30,

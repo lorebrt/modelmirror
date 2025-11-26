@@ -1,19 +1,19 @@
 {
     "mixed_services": [
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "simple"
         },
         {
-            "$reference": "database_service",
+            "$mirror": "database_service",
             "host": "localhost",
             "port": 5432,
             "database_name": "mixed_db"
         },
         {
-            "$reference": "user_service",
+            "$mirror": "user_service",
             "database": {
-                "$reference": "database_service",
+                "$mirror": "database_service",
                 "host": "user_host",
                 "port": 3306,
                 "database_name": "users"

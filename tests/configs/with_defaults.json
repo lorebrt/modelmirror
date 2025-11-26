@@ -1,6 +1,6 @@
 {
     "service": {
-        "$reference": "service_with_defaults",
+        "$mirror": "service_with_defaults",
         "name": "test_service"
     }
 }

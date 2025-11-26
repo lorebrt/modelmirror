@@ -1,6 +1,6 @@
 {
     "database": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "localhost",
         "port": 5432,
         "database_name": "testdb"

@@ -5,7 +5,7 @@
                 "level4": {
                     "level5": {
                         "service": {
-                            "$reference": "simple_service",
+                            "$mirror": "simple_service",
                             "name": "deep_service"
                         }
                     }

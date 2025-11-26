@@ -1,10 +1,10 @@
 {
     "required_service": {
-        "$reference": "simple_service",
+        "$mirror": "simple_service",
         "name": "required"
     },
     "optional_service": {
-        "$reference": "simple_service",
+        "$mirror": "simple_service",
         "name": "optional"
     },
     "optional_string": "provided_value"

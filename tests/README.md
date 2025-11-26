@@ -35,7 +35,7 @@ Tests fundamental JSON configuration patterns:
 
 - **Simple Instance Creation** - Basic object instantiation from JSON
 - **Multiple Parameters** - Services with multiple constructor parameters
-- **Singleton References** - Basic singleton functionality with `$reference`
+- **Singleton References** - Basic singleton functionality with `$mirror`
 - **Dependency Injection** - Services depending on other services
 - **Collections** - Lists and dictionaries of instances
 - **Nested Objects** - Complex nested object structures
@@ -49,7 +49,7 @@ Tests boundary conditions and error scenarios:
 - **Large Structures** - Performance with large arrays and deep nesting
 - **Unicode Support** - Special characters and internationalization
 - **Malformed JSON** - Graceful handling of syntax errors
-- **Invalid References** - Missing or malformed `$reference` objects
+- **Invalid References** - Missing or malformed `$mirror` objects
 - **Circular Dependencies** - Detection and handling of circular references
 
 ### 3. Validation and Type Safety (`test_json_validation.py`)
@@ -70,7 +70,7 @@ Tests Pydantic integration and type validation:
 ```json
 {
     "service": {
-        "$reference": {
+        "$mirror": {
             "registry": {"schema": "service_type", "version": "1.0.0"}
         },
         "param1": "value1",
@@ -84,14 +84,14 @@ Tests Pydantic integration and type validation:
 ```json
 {
     "shared_service": {
-        "$reference": {
+        "$mirror": {
             "registry": {"schema": "service_type", "version": "1.0.0"},
             "instance": "shared"
         },
         "config": "shared_config"
     },
     "dependent_service": {
-        "$reference": {
+        "$mirror": {
             "registry": {"schema": "other_service", "version": "1.0.0"}
         },
         "dependency": "$shared"
@@ -104,12 +104,12 @@ Tests Pydantic integration and type validation:
 ```json
 {
     "service_list": [
-        {"$reference": {...}, "param": "value1"},
-        {"$reference": {...}, "param": "value2"},
+        {"$mirror": {...}, "param": "value1"},
+        {"$mirror": {...}, "param": "value2"},
         "$singleton_reference"
     ],
     "service_map": {
-        "key1": {"$reference": {...}, "param": "value"},
+        "key1": {"$mirror": {...}, "param": "value"},
         "key2": "$singleton_reference"
     }
 }
@@ -120,11 +120,11 @@ Tests Pydantic integration and type validation:
 ```json
 {
     "complex_service": {
-        "$reference": {
+        "$mirror": {
             "registry": {"schema": "complex", "version": "1.0.0"}
         },
         "nested_dependency": {
-            "$reference": {
+            "$mirror": {
                 "registry": {"schema": "nested", "version": "1.0.0"}
             },
             "param": "nested_value"

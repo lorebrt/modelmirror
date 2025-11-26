@@ -1,20 +1,20 @@
 {
     "primary_database": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "",
         "port": -1,
         "database_name": "invalid_app"
     },
     "secondary_database": {
-        "$reference": "database_service",
+        "$mirror": "database_service",
         "host": "invalid-secondary.db.example.com",
         "port": 99999,
         "database_name": "invalid_secondary"
     },
     "user_service": {
-        "$reference": "user_service",
+        "$mirror": "user_service",
         "database": {
-            "$reference": "database_service",
+            "$mirror": "database_service",
             "host": "user.invalid.db.example.com",
             "port": 5432,
             "database_name": "users"

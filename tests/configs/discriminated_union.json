@@ -1,15 +1,15 @@
 {
     "service": {
-        "$reference": "simple_service",
+        "$mirror": "simple_service",
         "name": "discriminated_service"
     },
     "services": [
         {
-            "$reference": "simple_service",
+            "$mirror": "simple_service",
             "name": "union_service_1"
         },
         {
-            "$reference": "database_service",
+            "$mirror": "database_service",
             "host": "union.db.example.com",
             "port": 5432,
             "database_name": "union_db"

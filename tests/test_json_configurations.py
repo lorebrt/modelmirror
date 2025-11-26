@@ -194,7 +194,7 @@ class TestJSONConfigurations(unittest.TestCase):
         self.assertIn("Registry item", str(context.exception))
 
     def test_malformed_reference_object(self):
-        """Test error handling for malformed $reference objects."""
+        """Test error handling for malformed $mirror objects."""
         with self.assertRaises(Exception):
             self.mirror.reflect_raw('tests/configs/malformed_reference.json')
 

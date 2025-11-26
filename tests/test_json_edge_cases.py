@@ -34,7 +34,7 @@ class TestJSONEdgeCases(unittest.TestCase):
         self.assertIsInstance(config, EmptyConfig)
 
     def test_json_with_only_primitives(self):
-        """Test JSON containing only primitive values (no $reference objects)."""
+        """Test JSON containing only primitive values (no $mirror objects)."""
         with open('tests/configs/primitives_only.json', 'w') as f:
             json.dump({
                 "string_value": "test",
@@ -46,7 +46,7 @@ class TestJSONEdgeCases(unittest.TestCase):
             }, f)
         
         instances = self.mirror.reflect_raw('tests/configs/primitives_only.json')
-        # Should return empty instances since no $reference objects
+        # Should return empty instances since no $mirror objects
         # Try to get any service type - should return empty list
         services = instances.get(list[SimpleService])
         self.assertEqual(len(services), 0)
@@ -80,12 +80,12 @@ class TestJSONEdgeCases(unittest.TestCase):
             self.mirror.reflect_raw('tests/configs/malformed.json')
 
     def test_reference_object_missing_registry(self):
-        """Test $reference object missing required registry field."""
+        """Test $mirror object missing required registry field."""
         with self.assertRaises(Exception):
             self.mirror.reflect_raw('tests/configs/missing_registry.json')
 
     def test_reference_object_with_extra_fields(self):
-        """Test $reference object with unexpected extra fields."""
+        """Test $mirror object with unexpected extra fields."""
         # Should handle gracefully by ignoring extra fields
         instances = self.mirror.reflect_raw('tests/configs/extra_fields.json')
         services = instances.get(list[SimpleService])
@@ -102,7 +102,7 @@ class TestJSONEdgeCases(unittest.TestCase):
         with open('tests/configs/valid_numeric_singleton.json', 'w') as f:
             json.dump({
                 "service1": {
-                    "$reference": "simple_service:123",
+                    "$mirror": "simple_service:123",
                     "name": "numeric_singleton"
                 }
             }, f)
@@ -113,7 +113,7 @@ class TestJSONEdgeCases(unittest.TestCase):
         self.assertEqual(services[0].name, "numeric_singleton")
 
     def test_numeric_and_boolean_singleton_names(self):
-        """Test that putting $reference in string field is a user configuration error."""
+        """Test that putting $mirror in string field is a user configuration error."""
         # This should fail because service2 has "name": "$123" which resolves to an object,
         # but SimpleService.name expects a string. This is a user configuration error.
         with self.assertRaises(Exception):

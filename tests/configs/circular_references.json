@@ -1,11 +1,11 @@
 {
     "service_a": {
-        "$reference": "user_service:a",
+        "$mirror": "user_service:a",
         "database": "$b",
         "cache_enabled": true
     },
     "service_b": {
-        "$reference": "database_service:b",
+        "$mirror": "database_service:b",
         "host": "$a",
         "port": 5432,
         "database_name": "circular"
