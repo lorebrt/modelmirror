@@ -21,7 +21,7 @@ class TestClassRegisterValidation(unittest.TestCase):
         """Test that ClassRegister raises ValueError when reference attribute is None."""
         with self.assertRaisesRegex(ValueError, "ClassRegister reference must be provided for class"):
             class InvalidRegister(ClassRegister):
-                reference = None
+                reference = None # type: ignore
 
     def test_class_register_with_valid_reference(self):
         """Test that ClassRegister works correctly when valid reference is provided."""
