@@ -1,10 +1,7 @@
 {
     "primary_database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            },
+            "registry": {"id": "database_service"},
             "instance": "primary_db"
         },
         "host": "localhost",
@@ -13,10 +10,7 @@
     },
     "secondary_database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "localhost",
         "port": 5433,
@@ -24,10 +18,7 @@
     },
     "user_service": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": "$primary_db",
         "cache_enabled": false
@@ -35,10 +26,7 @@
     "microservices": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "dev_service_1"
         }
@@ -46,28 +34,19 @@
     "service_registry": {
         "test": {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "test_service"
         }
     },
     "orchestrator": {
         "$reference": {
-            "registry": {
-                "schema": "complex_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "complex_service"}
         },
         "database": "$primary_db",
         "user_service": {
             "$reference": {
-                "registry": {
-                    "schema": "user_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "user_service"}
             },
             "database": "$primary_db",
             "cache_enabled": true

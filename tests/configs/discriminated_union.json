@@ -1,29 +1,20 @@
 {
     "service": {
         "$reference": {
-            "registry": {
-                "schema": "simple_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "simple_service"}
         },
         "name": "discriminated_service"
     },
     "services": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "union_service_1"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "database_service"}
             },
             "host": "union.db.example.com",
             "port": 5432,

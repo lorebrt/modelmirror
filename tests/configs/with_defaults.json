@@ -1,10 +1,7 @@
 {
     "service": {
         "$reference": {
-            "registry": {
-                "schema": "service_with_defaults",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "service_with_defaults"}
         },
         "name": "test_service"
     }

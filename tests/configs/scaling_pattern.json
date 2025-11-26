@@ -1,10 +1,7 @@
 {
     "load_balancer_db": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "lb.db.example.com",
         "port": 5432,
@@ -12,10 +9,7 @@
     },
     "shard_db": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "shard.db.example.com",
         "port": 5432,
@@ -24,46 +18,31 @@
     "worker_services": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "worker_1"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "worker_2"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "worker_3"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "worker_4"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "worker_5"
         }

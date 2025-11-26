@@ -1,17 +1,11 @@
 {
     "core_system": {
         "$reference": {
-            "registry": {
-                "schema": "complex_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "complex_service"}
         },
         "database": {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "database_service"}
             },
             "host": "core.db.example.com",
             "port": 5432,
@@ -19,17 +13,11 @@
         },
         "user_service": {
             "$reference": {
-                "registry": {
-                    "schema": "user_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "user_service"}
             },
             "database": {
                 "$reference": {
-                    "registry": {
-                        "schema": "database_service",
-                        "version": "1.0.0"
-                    }
+                    "registry": {"id": "database_service"}
                 },
                 "host": "users.db.example.com",
                 "port": 5432,
@@ -44,28 +32,19 @@
     "plugins": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "auth_plugin"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "logging_plugin"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "metrics_plugin"
         }

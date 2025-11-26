@@ -2,19 +2,13 @@
     "services": {
         "primary": {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "primary_service"
         },
         "secondary": {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "secondary_service"
         }

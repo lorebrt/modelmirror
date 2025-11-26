@@ -1,10 +1,7 @@
 {
     "service": {
         "$reference": {
-            "registry": {
-                "schema": "validation_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "validation_service"}
         },
         "name": "custom_validation_service",
         "port": 8080,

@@ -1,17 +1,11 @@
 {
     "complex_service": {
         "$reference": {
-            "registry": {
-                "schema": "complex_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "complex_service"}
         },
         "database": {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                },
+                "registry": {"id": "database_service"},
                 "instance": "nested_db"
             },
             "host": "nested.example.com",
@@ -20,10 +14,7 @@
         },
         "user_service": {
             "$reference": {
-                "registry": {
-                    "schema": "user_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "user_service"}
             },
             "database": "$nested_db",
             "cache_enabled": false

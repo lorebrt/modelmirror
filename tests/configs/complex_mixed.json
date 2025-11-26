@@ -1,10 +1,7 @@
 {
     "database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            },
+            "registry": {"id": "database_service"},
             "instance": "main_database"
         },
         "host": "localhost",
@@ -13,10 +10,7 @@
     },
     "user_service": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": "$main_database",
         "cache_enabled": true
@@ -24,20 +18,14 @@
     "services": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                },
+                "registry": {"id": "simple_service"},
                 "instance": "primary_service"
             },
             "name": "primary"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "secondary"
         }
@@ -46,10 +34,7 @@
         "primary": "$primary_service",
         "backup": {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "backup"
         }

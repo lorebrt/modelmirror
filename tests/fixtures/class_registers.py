@@ -14,55 +14,55 @@ from tests.fixtures.test_classes import (
 
 
 class SimpleServiceRegister(ClassRegister, 
-    reference=ClassReference(schema="simple_service", version="1.0.0", cls=SimpleService)):
+    reference=ClassReference(id="simple_service", cls=SimpleService)):
     pass
 
 
 class DatabaseServiceRegister(ClassRegister,
-    reference=ClassReference(schema="database_service", version="1.0.0", cls=DatabaseService)):
+    reference=ClassReference(id="database_service", cls=DatabaseService)):
     pass
 
 
 class UserServiceRegister(ClassRegister,
-    reference=ClassReference(schema="user_service", version="1.0.0", cls=UserService)):
+    reference=ClassReference(id="user_service", cls=UserService)):
     pass
 
 
 class ConfigurableServiceRegister(ClassRegister,
-    reference=ClassReference(schema="configurable_service", version="1.0.0", cls=ConfigurableService)):
+    reference=ClassReference(id="configurable_service", cls=ConfigurableService)):
     pass
 
 
 class ComplexServiceRegister(ClassRegister,
-    reference=ClassReference(schema="complex_service", version="1.0.0", cls=ComplexService)):
+    reference=ClassReference(id="complex_service", cls=ComplexService)):
     pass
 
 
 class ServiceWithDefaultsRegister(ClassRegister,
-    reference=ClassReference(schema="service_with_defaults", version="1.0.0", cls=ServiceWithDefaults)):
+    reference=ClassReference(id="service_with_defaults", cls=ServiceWithDefaults)):
     pass
 
 
 class ServiceWithOptionalsRegister(ClassRegister,
-    reference=ClassReference(schema="service_with_optionals", version="1.0.0", cls=ServiceWithOptionals)):
+    reference=ClassReference(id="service_with_optionals", cls=ServiceWithOptionals)):
     pass
 
 
 class ListServiceRegister(ClassRegister,
-    reference=ClassReference(schema="list_service", version="1.0.0", cls=ListService)):
+    reference=ClassReference(id="list_service", cls=ListService)):
     pass
 
 
 class DictServiceRegister(ClassRegister,
-    reference=ClassReference(schema="dict_service", version="1.0.0", cls=DictService)):
+    reference=ClassReference(id="dict_service", cls=DictService)):
     pass
 
 
 class NestedServiceRegister(ClassRegister,
-    reference=ClassReference(schema="nested_service", version="1.0.0", cls=NestedService)):
+    reference=ClassReference(id="nested_service", cls=NestedService)):
     pass
 
 
 class ValidationServiceRegister(ClassRegister,
-    reference=ClassReference(schema="validation_service", version="1.0.0", cls=ValidationService)):
+    reference=ClassReference(id="validation_service", cls=ValidationService)):
     pass

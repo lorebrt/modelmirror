@@ -1,10 +1,7 @@
 {
     "service": {
         "$reference": {
-            "registry": {
-                "schema": "nonexistent_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "nonexistent_service"}
         },
         "name": "test"
     }

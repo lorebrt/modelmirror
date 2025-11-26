@@ -2,19 +2,13 @@
     "mixed_services": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "simple"
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "database_service"}
             },
             "host": "localhost",
             "port": 5432,
@@ -22,17 +16,11 @@
         },
         {
             "$reference": {
-                "registry": {
-                    "schema": "user_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "user_service"}
             },
             "database": {
                 "$reference": {
-                    "registry": {
-                        "schema": "database_service",
-                        "version": "1.0.0"
-                    }
+                    "registry": {"id": "database_service"}
                 },
                 "host": "user_host",
                 "port": 3306,

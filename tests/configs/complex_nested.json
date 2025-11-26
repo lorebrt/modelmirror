@@ -6,10 +6,7 @@
             [
                 {
                     "$reference": {
-                        "registry": {
-                            "schema": "simple_service",
-                            "version": "1.0.0"
-                        }
+                        "registry": {"id": "simple_service"}
                     },
                     "name": "nested_in_array"
                 }
@@ -21,10 +18,7 @@
                     "services": [
                         {
                             "$reference": {
-                                "registry": {
-                                    "schema": "simple_service",
-                                    "version": "1.0.0"
-                                }
+                                "registry": {"id": "simple_service"}
                             },
                             "name": "deeply_nested"
                         }

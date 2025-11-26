@@ -1,9 +1,5 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class ReflectionRegistry(BaseModel):
-    schema_: str = Field(
-        ...,
-        alias="schema",
-    )
-    version: str
+    id: str

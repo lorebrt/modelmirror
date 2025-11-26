@@ -1,9 +1,9 @@
 {
     "services": [
-        {"$reference": {"registry": {"schema": "simple_service", "version": "1.0.0"}}, "name": "service_0"},
-        {"$reference": {"registry": {"schema": "simple_service", "version": "1.0.0"}}, "name": "service_1"},
-        {"$reference": {"registry": {"schema": "simple_service", "version": "1.0.0"}}, "name": "service_2"},
-        {"$reference": {"registry": {"schema": "simple_service", "version": "1.0.0"}}, "name": "service_3"},
-        {"$reference": {"registry": {"schema": "simple_service", "version": "1.0.0"}}, "name": "service_4"}
+        {"$reference": {"registry": {"id": "simple_service"}}, "name": "service_0"},
+        {"$reference": {"registry": {"id": "simple_service"}}, "name": "service_1"},
+        {"$reference": {"registry": {"id": "simple_service"}}, "name": "service_2"},
+        {"$reference": {"registry": {"id": "simple_service"}}, "name": "service_3"},
+        {"$reference": {"registry": {"id": "simple_service"}}, "name": "service_4"}
     ]
 }

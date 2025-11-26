@@ -1,10 +1,7 @@
 {
     "database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "state.test.db",
         "port": 5432,

@@ -1,10 +1,7 @@
 {
     "database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "inheritance.db.example.com",
         "port": 5432,
@@ -12,17 +9,11 @@
     },
     "user_service": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "database_service"}
             },
             "host": "user.inheritance.db.example.com",
             "port": 5432,

@@ -1,10 +1,7 @@
 {
     "service_a": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            },
+            "registry": {"id": "user_service"},
             "instance": "a"
         },
         "database": "$b",
@@ -12,10 +9,7 @@
     },
     "service_b": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            },
+            "registry": {"id": "database_service"},
             "instance": "b"
         },
         "host": "$a",

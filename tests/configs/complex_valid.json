@@ -1,10 +1,7 @@
 {
     "primary_database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "valid.db.example.com",
         "port": 5432,
@@ -12,10 +9,7 @@
     },
     "secondary_database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "database_service"}
         },
         "host": "valid-secondary.db.example.com",
         "port": 5432,
@@ -23,17 +17,11 @@
     },
     "user_service": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "database_service"}
             },
             "host": "user.db.example.com",
             "port": 5432,
@@ -44,10 +32,7 @@
     "microservices": [
         {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "valid_service"
         }
@@ -55,27 +40,18 @@
     "service_registry": {
         "main": {
             "$reference": {
-                "registry": {
-                    "schema": "simple_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "simple_service"}
             },
             "name": "main_service"
         }
     },
     "orchestrator": {
         "$reference": {
-            "registry": {
-                "schema": "complex_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "complex_service"}
         },
         "database": {
             "$reference": {
-                "registry": {
-                    "schema": "database_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "database_service"}
             },
             "host": "orchestrator.db.example.com",
             "port": 5432,
@@ -83,17 +59,11 @@
         },
         "user_service": {
             "$reference": {
-                "registry": {
-                    "schema": "user_service",
-                    "version": "1.0.0"
-                }
+                "registry": {"id": "user_service"}
             },
             "database": {
                 "$reference": {
-                    "registry": {
-                        "schema": "database_service",
-                        "version": "1.0.0"
-                    }
+                    "registry": {"id": "database_service"}
                 },
                 "host": "orch-user.db.example.com",
                 "port": 5432,

@@ -1,12 +1,8 @@
 from typing import Type
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class ClassReference(BaseModel):
-    schema_: str = Field(
-        ...,
-        alias="schema",
-    )
-    version: str
+    id: str
     cls: Type

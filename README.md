@@ -46,14 +46,14 @@ Create registry entries that link your classes to schema identifiers:
 from modelmirror.class_provider.class_register import ClassRegister
 from modelmirror.class_provider.class_reference import ClassReference
 
-# Register DatabaseService with schema "database" and version "1.0.0"
+# Register DatabaseService with id "database"
 class DatabaseServiceRegister(ClassRegister,
-    reference=ClassReference(schema="database", version="1.0.0", cls=DatabaseService)):
+    reference=ClassReference(id="database", cls=DatabaseService)):
     pass
 
-# Register UserService with schema "user_service" and version "1.0.0"
+# Register UserService with id "user_service"
 class UserServiceRegister(ClassRegister,
-    reference=ClassReference(schema="user_service", version="1.0.0", cls=UserService)):
+    reference=ClassReference(id="user_service", cls=UserService)):
     pass
 ```
 
@@ -65,7 +65,7 @@ Create a `config.json` file that defines your instances:
 {
     "my_database": {
         "$reference": {
-            "registry": {"schema": "database", "version": "1.0.0"},
+            "registry": {"id": "database"},
             "instance": "db_singleton"
         },
         "host": "localhost",
@@ -73,7 +73,7 @@ Create a `config.json` file that defines your instances:
     },
     "my_user_service": {
         "$reference": {
-            "registry": {"schema": "user_service", "version": "1.0.0"}
+            "registry": {"id": "user_service"}
         },
         "db": "$db_singleton",
         "cache_enabled": true
@@ -127,7 +127,7 @@ Every object in your JSON you want to mirror needs a `$reference` block:
 {
     "my_service": {
         "$reference": {
-            "registry": {"schema": "service", "version": "1.0.0"}
+            "registry": {"id": "service"}
         },
         "name": "My Service"
     }
@@ -135,7 +135,7 @@ Every object in your JSON you want to mirror needs a `$reference` block:
 ```
 
 This tells ModelMirror:
-1. Create an instance using the class registered with schema "service" v1.0.0
+1. Create an instance using the class registered with id "service"
 2. Pass `"name": "My Service"` as a constructor parameter
 
 ### Singleton References - Reuse Instances Anywhere
@@ -146,7 +146,7 @@ Add an `instance` field to create a reusable singleton:
 {
     "database": {
         "$reference": {
-            "registry": {"schema": "database", "version": "1.0.0"},
+            "registry": {"id": "database"},
             "instance": "main_db"
         },
         "host": "localhost",
@@ -154,13 +154,13 @@ Add an `instance` field to create a reusable singleton:
     },
     "user_service": {
         "$reference": {
-            "registry": {"schema": "user_service", "version": "1.0.0"}
+            "registry": {"id": "user_service"}
         },
         "database": "$main_db"
     },
     "admin_service": {
         "$reference": {
-            "registry": {"schema": "admin_service", "version": "1.0.0"}
+            "registry": {"id": "admin_service"}
         },
         "database": "$main_db"
     }
@@ -195,7 +195,7 @@ ModelMirror handles lists and dictionaries seamlessly.
 {
     "primary_db": {
         "$reference": {
-            "registry": {"schema": "database", "version": "1.0.0"},
+            "registry": {"id": "database"},
             "instance": "primary"
         },
         "host": "primary.db.com",
@@ -204,14 +204,14 @@ ModelMirror handles lists and dictionaries seamlessly.
     "services": [
         {
             "$reference": {
-                "registry": {"schema": "service", "version": "1.0.0"}
+                "registry": {"id": "service"}
             },
             "name": "Service 1",
             "database": "$primary"
         },
         {
             "$reference": {
-                "registry": {"schema": "service", "version": "1.0.0"}
+                "registry": {"id": "service"}
             },
             "name": "Service 2",
             "database": "$primary"
@@ -243,7 +243,7 @@ print(f"Loaded {len(config.services)} services")
     "databases": {
         "primary": {
             "$reference": {
-                "registry": {"schema": "database", "version": "1.0.0"},
+                "registry": {"id": "database"},
                 "instance": "primary_db"
             },
             "host": "primary.db.com",
@@ -251,7 +251,7 @@ print(f"Loaded {len(config.services)} services")
         },
         "secondary": {
             "$reference": {
-                "registry": {"schema": "database", "version": "1.0.0"},
+                "registry": {"id": "database"},
                 "instance": "secondary_db"
             },
             "host": "secondary.db.com",
@@ -260,7 +260,7 @@ print(f"Loaded {len(config.services)} services")
     },
     "load_balancer": {
         "$reference": {
-            "registry": {"schema": "load_balancer", "version": "1.0.0"}
+            "registry": {"id": "load_balancer"}
         },
         "primary_db": "$primary_db",
         "secondary_db": "$secondary_db"
@@ -294,7 +294,7 @@ ModelMirror handles deeply nested configurations effortlessly.
 {
     "cache": {
         "$reference": {
-            "registry": {"schema": "cache", "version": "1.0.0"},
+            "registry": {"id": "cache"},
             "instance": "redis_cache"
         },
         "host": "redis.internal",
@@ -302,7 +302,7 @@ ModelMirror handles deeply nested configurations effortlessly.
     },
     "database": {
         "$reference": {
-            "registry": {"schema": "database", "version": "1.0.0"},
+            "registry": {"id": "database"},
             "instance": "postgres_db"
         },
         "host": "postgres.internal",
@@ -310,7 +310,7 @@ ModelMirror handles deeply nested configurations effortlessly.
     },
     "user_service": {
         "$reference": {
-            "registry": {"schema": "user_service", "version": "1.0.0"},
+            "registry": {"id": "user_service"},
             "instance": "user_svc"
         },
         "database": "$postgres_db",
@@ -318,7 +318,7 @@ ModelMirror handles deeply nested configurations effortlessly.
     },
     "notification_service": {
         "$reference": {
-            "registry": {"schema": "notification_service", "version": "1.0.0"}
+            "registry": {"id": "notification_service"}
         },
         "user_service": "$user_svc",
         "templates": {
@@ -354,7 +354,7 @@ config = mirror.reflect_typed('config.json', AppConfig)
     "microservices": {
         "auth": {
             "$reference": {
-                "registry": {"schema": "auth_service", "version": "1.0.0"},
+                "registry": {"id": "auth_service"},
                 "instance": "auth"
             },
             "jwt_secret": "secret123",
@@ -362,7 +362,7 @@ config = mirror.reflect_typed('config.json', AppConfig)
         },
         "api_gateway": {
             "$reference": {
-                "registry": {"schema": "gateway", "version": "1.0.0"}
+                "registry": {"id": "gateway"}
             },
             "auth_service": "$auth",
             "routes": [

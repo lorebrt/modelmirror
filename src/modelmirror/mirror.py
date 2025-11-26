@@ -61,11 +61,11 @@ class Mirror:
 
         return _hook
 
-    def __get_class_reference(self, schema: str, version: str) -> ClassReference:
+    def __get_class_reference(self, id: str) -> ClassReference:
         for registered_class in self.__registered_classes:
-            if registered_class.schema_ == schema and registered_class.version == version:
+            if registered_class.id == id:
                 return registered_class
-        raise ValueError(f"Registry item with schema {schema} and version {version} not found")
+        raise ValueError(f"Registry item with id {id} not found")
 
     def __resolve_instances(self) -> dict[str, Any]:
         instances: dict[str, Any] = {}
@@ -100,9 +100,7 @@ class Mirror:
             refs = self.__reference_service.find(list(params.values()))
             instance = reflection_metadata.instance
 
-            class_reference = self.__get_class_reference(
-                reflection_metadata.registry.schema_, reflection_metadata.registry.version
-            )
+            class_reference = self.__get_class_reference(reflection_metadata.registry.id)
 
             self.__instance_properties[node_id] = InstanceProperties(
                 node_id,

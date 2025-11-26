@@ -1,10 +1,7 @@
 {
     "database": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            },
+            "registry": {"id": "database_service"},
             "instance": "main_db"
         },
         "host": "localhost",

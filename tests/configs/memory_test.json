@@ -1,10 +1,7 @@
 {
     "shared_db": {
         "$reference": {
-            "registry": {
-                "schema": "database_service",
-                "version": "1.0.0"
-            },
+            "registry": {"id": "database_service"},
             "instance": "shared_database"
         },
         "host": "shared.db.example.com",
@@ -13,30 +10,21 @@
     },
     "service_1": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": "$shared_database",
         "cache_enabled": true
     },
     "service_2": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": "$shared_database",
         "cache_enabled": false
     },
     "service_3": {
         "$reference": {
-            "registry": {
-                "schema": "user_service",
-                "version": "1.0.0"
-            }
+            "registry": {"id": "user_service"}
         },
         "database": "$shared_database",
         "cache_enabled": true

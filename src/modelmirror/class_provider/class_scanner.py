@@ -25,9 +25,7 @@ class ClassScanner:
             if class_reference:
                 reference: ClassReference = class_reference
                 if self.__is_present(reference):
-                    raise Exception(
-                        f"Duplicate class registration with schema {reference.schema_} and version {reference.version}"
-                    )
+                    raise Exception(f"Duplicate class registration with id {reference.id}")
                 self.__set_init_decorator(reference)
                 self.__classes_reference.append(reference)
         return self.__classes_reference
@@ -41,7 +39,7 @@ class ClassScanner:
 
     def __is_present(self, reference: ClassReference):
         for class_reference in self.__classes_reference:
-            if class_reference.schema_ == reference.schema_ and class_reference.version == reference.version:
+            if class_reference.id == reference.id:
                 return True
         return False
 

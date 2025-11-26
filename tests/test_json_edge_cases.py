@@ -103,7 +103,7 @@ class TestJSONEdgeCases(unittest.TestCase):
             json.dump({
                 "service1": {
                     "$reference": {
-                        "registry": {"schema": "simple_service", "version": "1.0.0"},
+                        "registry": {"id": "simple_service"},
                         "instance": "123"
                     },
                     "name": "numeric_singleton"
