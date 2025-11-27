@@ -37,7 +37,10 @@ class TestJSONEdgeCases(unittest.TestCase):
 
     def test_json_with_only_primitives(self):
         """Test JSON containing only primitive values (no $mirror objects)."""
-        with open("tests/configs/primitives_only.json", "w") as f:
+        import os
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             json.dump(
                 {
                     "string_value": "test",
@@ -49,8 +52,12 @@ class TestJSONEdgeCases(unittest.TestCase):
                 },
                 f,
             )
+            temp_file = f.name
 
-        instances = self.mirror.reflect_raw("tests/configs/primitives_only.json")
+        try:
+            instances = self.mirror.reflect_raw(temp_file)
+        finally:
+            os.unlink(temp_file)
         # Should return empty instances since no $mirror objects
         # Try to get any service type - should return empty list
         services = instances.get(list[SimpleService])
@@ -103,11 +110,18 @@ class TestJSONEdgeCases(unittest.TestCase):
 
     def test_valid_numeric_singleton_names(self):
         """Test that numeric singleton names work correctly when used properly."""
-        # Create a valid config where numeric singleton is used in object field, not string field
-        with open("tests/configs/valid_numeric_singleton.json", "w") as f:
-            json.dump({"service1": {"$mirror": "simple_service:123", "name": "numeric_singleton"}}, f)
+        import os
+        import tempfile
 
-        instances = self.mirror.reflect_raw("tests/configs/valid_numeric_singleton.json")
+        # Create a valid config where numeric singleton is used in object field, not string field
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+            json.dump({"service1": {"$mirror": "simple_service:123", "name": "numeric_singleton"}}, f)
+            temp_file = f.name
+
+        try:
+            instances = self.mirror.reflect_raw(temp_file)
+        finally:
+            os.unlink(temp_file)
         services = instances.get(list[SimpleService])
         self.assertEqual(len(services), 1)
         self.assertEqual(services[0].name, "numeric_singleton")
