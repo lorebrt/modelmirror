@@ -1,3 +1,7 @@
+"""
+Fixed Mirror implementation with proper isolation and cleanup.
+"""
+
 from glob import glob
 from graphlib import TopologicalSorter
 from typing import Any, TypeVar
@@ -17,37 +21,47 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class Mirror:
+    """Fixed Mirror implementation with proper isolation."""
+
     def __init__(
         self,
         package_name: str = "app",
         parser: ReferenceParser = DefaultReferenceParser(),
         placeholder: str = "$mirror",
     ):
-        self.__registered_classes: list[ClassReference] = ClassScanner(package_name).scan()
+        self.__parser = parser or DefaultReferenceParser()
+        self.__placeholder = placeholder
+
+        scanner = ClassScanner(package_name)
+        self.__registered_classes: list[ClassReference] = scanner.scan()
         self.__instance_properties: dict[str, InstanceProperties] = {}
         self.__reference_service = ReferenceService()
         self.__singleton_path: dict[str, str] = {}
-        self.__parser = parser
-        self.__placeholder = placeholder
 
     def reflect(self, config_path: str, model: type[T]) -> T:
-        self.__auto_reset()
+        """Reflect configuration with proper isolation."""
+        self.__reset_state()
+
         reflection_config_file = self.__get_reflection_config_file(config_path)
         with open(reflection_config_file) as file:
             json_utils.json_load_with_context(file, self.__create_instance_map)
             instances = self.__resolve_instances()
+
         with open(reflection_config_file) as file:
             raw_model = json_utils.json_load_with_context(file, hook=self.__instantiate_model(instances))
             return model(**raw_model)
 
     def reflect_raw(self, config_path: str) -> Reflections:
-        self.__auto_reset()
+        """Reflect configuration returning raw instances."""
+        self.__reset_state()
+
         reflection_config_file = self.__get_reflection_config_file(config_path)
         with open(reflection_config_file) as file:
             json_utils.json_load_with_context(file, self.__create_instance_map)
             return Reflections(self.__resolve_instances(), self.__singleton_path)
 
-    def __auto_reset(self) -> None:
+    def __reset_state(self):
+        """Reset state between reflections."""
         self.__instance_properties = {}
         self.__reference_service = ReferenceService()
         self.__singleton_path = {}

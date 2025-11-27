@@ -1,5 +1,10 @@
+"""
+Isolated class scanner that creates copies instead of modifying classes globally.
+"""
+
 import importlib
 import pkgutil
+from typing import Dict, Type
 
 from pydantic import validate_call
 
@@ -8,40 +13,66 @@ from modelmirror.class_provider.class_register import ClassRegister
 
 
 class ClassScanner:
+    """Scanner that creates isolated class copies instead of global modifications."""
+
     def __init__(self, package_name: str):
         self.__package_name = package_name
-        self.__base_class = ClassRegister
-        self.__classes_reference: list[ClassReference] = []
+        self.__original_classes: Dict[str, Type] = {}
+        self.__isolated_classes: Dict[str, Type] = {}
 
     def scan(self) -> list[ClassReference]:
+        """Scan and create isolated class copies with validation."""
         self.__import_all_modules(self.__package_name)
-        subclasses = self.__all_subclasses(self.__base_class)
+        subclasses = self.__all_subclasses(ClassRegister)
+        classes_reference: list[ClassReference] = []
+
         for cls in subclasses:
-            # filter by module prefix
             if not cls.__module__.startswith(self.__package_name):
                 continue
 
             class_reference = getattr(cls, "reference", None)
-            if class_reference:
-                reference: ClassReference = class_reference
-                if self.__is_present(reference):
-                    raise Exception(f"Duplicate class registration with id {reference.id}")
-                self.__set_init_decorator(reference)
-                self.__classes_reference.append(reference)
-        return self.__classes_reference
+            if not class_reference:
+                continue
 
-    def __set_init_decorator(self, cls_reference: ClassReference):
-        init_method = cls_reference.cls.__dict__.get("__init__")
+            if self.__is_duplicate(class_reference, classes_reference):
+                raise Exception(f"Duplicate class registration with id {class_reference.id}")
+
+            # Create isolated copy instead of modifying original
+            isolated_class = self.__create_isolated_class(class_reference.cls)
+            isolated_reference = ClassReference(id=class_reference.id, cls=isolated_class)
+
+            classes_reference.append(isolated_reference)
+
+        return classes_reference
+
+    def __create_isolated_class(self, original_class: Type) -> Type:
+        """Create an isolated copy of the class with validation."""
+        class_name = f"Isolated{original_class.__name__}"
+
+        # Store original for potential restoration
+        self.__original_classes[class_name] = original_class
+
+        # Create isolated class with validation
+        class IsolatedClass(original_class):
+            pass
+
+        IsolatedClass.__name__ = class_name
+        IsolatedClass.__qualname__ = class_name
+
+        # Add validation to the isolated class only
+        init_method = original_class.__init__
         if init_method:
-            cls_reference.cls.__init__ = validate_call(config={"arbitrary_types_allowed": True, "extra": "forbid"})(
-                init_method
+            setattr(
+                IsolatedClass,
+                "__init__",
+                validate_call(config={"arbitrary_types_allowed": True, "extra": "forbid"})(init_method),
             )
 
-    def __is_present(self, reference: ClassReference):
-        for class_reference in self.__classes_reference:
-            if class_reference.id == reference.id:
-                return True
-        return False
+        self.__isolated_classes[class_name] = IsolatedClass
+        return IsolatedClass
+
+    def __is_duplicate(self, reference: ClassReference, existing: list[ClassReference]) -> bool:
+        return any(ref.id == reference.id for ref in existing)
 
     def __import_all_modules(self, package_name: str):
         package = importlib.import_module(package_name)
