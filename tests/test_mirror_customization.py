@@ -8,41 +8,41 @@ import unittest
 from pydantic import BaseModel, ConfigDict
 
 from modelmirror.mirror import Mirror
-from modelmirror.parser.default_reference_parser import DefaultReferenceParser
-from modelmirror.parser.reference_parser import FormatValidation, ParsedReference, ReferenceParser
+from modelmirror.parser.default_key_parser import DefaultKeyParser
+from modelmirror.parser.key_parser import FormatValidation, KeyParser, ParsedKey
 from tests.fixtures.test_classes import DatabaseService, SimpleService, UserService
 
 
-class CustomReferenceParser(ReferenceParser):
+class CustomKeyParser(KeyParser):
     """Custom parser that uses @ symbol for instances: service@instance"""
 
-    def _validate(self, reference: str) -> FormatValidation:
+    def _validate(self, key: str) -> FormatValidation:
         return FormatValidation(is_valid=True)
 
-    def _parse(self, reference: str) -> ParsedReference:
-        if "@" in reference:
-            id_part, instance = reference.split("@", 1)
-            return ParsedReference(id=id_part, instance=instance)
-        return ParsedReference(id=reference, instance=None)
+    def _parse(self, key: str) -> ParsedKey:
+        if "@" in key:
+            id_part, instance = key.split("@", 1)
+            return ParsedKey(id=id_part, instance=instance)
+        return ParsedKey(id=key, instance=None)
 
 
-class VersionedReferenceParser(ReferenceParser):
+class VersionedKeyParser(KeyParser):
     """Parser that requires version: service:v1.0@instance"""
 
-    def _validate(self, reference: str) -> FormatValidation:
-        if ":" not in reference:
+    def _validate(self, key: str) -> FormatValidation:
+        if ":" not in key:
             return FormatValidation(False, "Version required: use 'id:version' or 'id:version@instance'")
         return FormatValidation(True)
 
-    def _parse(self, reference: str) -> ParsedReference:
-        if "@" in reference:
-            id_version, instance = reference.split("@", 1)
+    def _parse(self, key: str) -> ParsedKey:
+        if "@" in key:
+            id_version, instance = key.split("@", 1)
         else:
-            id_version, instance = reference, None
+            id_version, instance = key, None
 
         id_part, version = id_version.split(":", 1)
         # For testing, we ignore version and just use id
-        return ParsedReference(id=id_part, instance=instance)
+        return ParsedKey(id=id_part, instance=instance)
 
 
 class TestConfig(BaseModel):
@@ -70,7 +70,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_custom_placeholder(self):
         """Test Mirror with custom placeholder."""
-        mirror = Mirror("tests.fixtures", DefaultReferenceParser("$ref"))
+        mirror = Mirror("tests.fixtures", DefaultKeyParser("$ref"))
 
         config_data = {"service": {"$ref": "simple_service", "name": "custom_placeholder"}}
 
@@ -82,7 +82,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_custom_parser_with_at_symbol(self):
         """Test Mirror with custom parser using @ for instances."""
-        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(placeholder="$mirror"))
+        mirror = Mirror("tests.fixtures", parser=CustomKeyParser(placeholder="$mirror"))
 
         config_data = {
             "database": {
@@ -109,7 +109,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_versioned_parser(self):
         """Test Mirror with versioned parser."""
-        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser(placeholder="$mirror"))
+        mirror = Mirror("tests.fixtures", parser=VersionedKeyParser(placeholder="$mirror"))
 
         config_data = {"service": {"$mirror": "simple_service:v1.0", "name": "versioned_service"}}
 
@@ -121,7 +121,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_versioned_parser_with_instance(self):
         """Test versioned parser with instance."""
-        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser(placeholder="$mirror"))
+        mirror = Mirror("tests.fixtures", parser=VersionedKeyParser(placeholder="$mirror"))
 
         config_data = {
             "database": {
@@ -148,7 +148,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_custom_placeholder_and_parser_together(self):
         """Test Mirror with both custom placeholder and parser."""
-        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(placeholder="$create"))
+        mirror = Mirror("tests.fixtures", parser=CustomKeyParser(placeholder="$create"))
 
         config_data = {
             "service": {"$create": "simple_service@my_instance", "name": "combined_test"},
@@ -169,7 +169,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_parser_validation_error(self):
         """Test that parser validation errors are properly raised."""
-        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser(placeholder="$mirror"))
+        mirror = Mirror("tests.fixtures", parser=VersionedKeyParser(placeholder="$mirror"))
 
         config_data = {"service": {"$mirror": "simple_service", "name": "invalid"}}  # Missing version
 
@@ -183,7 +183,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_raw_reflection_with_custom_features(self):
         """Test raw reflection works with custom parser and placeholder."""
-        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(placeholder="$build"))
+        mirror = Mirror("tests.fixtures", parser=CustomKeyParser(placeholder="$build"))
 
         config_data = {"service": {"$build": "simple_service@shared", "name": "raw_test"}}
 

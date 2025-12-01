@@ -172,20 +172,20 @@ Add `:instance_name` to create a reusable singleton:
 ModelMirror uses a pluggable parser system to handle `$mirror` strings:
 
 ```python
-from modelmirror.parser.reference_parser import ReferenceParser
-from modelmirror.parser.default_reference_parser import DefaultReferenceParser
+from modelmirror.parser.key_parser import KeyParser
+from modelmirror.parser.default_key_parser import DefaultKeyParser
 
 # Default parser handles: "id" and "id:instance"
-default_parser = DefaultReferenceParser()
+default_parser = DefaultKeyParser()
 
 # You can create custom parsers for different formats
-class CustomReferenceParser(ReferenceParser):
+class CustomKeyParser(KeyParser):
     def _parse(self, reference: str):
         # Your custom parsing logic
         pass
 
 # Use custom parser
-mirror = Mirror('myapp', parser=CustomReferenceParser())
+mirror = Mirror('myapp', parser=CustomKeyParser())
 ```
 
 **Built-in Parser Features:**
@@ -198,7 +198,7 @@ mirror = Mirror('myapp', parser=CustomReferenceParser())
 
 ModelMirror processes references in a specific order:
 
-1. **Parse**: `DefaultReferenceParser` converts `"database:main_db"` to `ParsedReference(id="database", instance="main_db")`
+1. **Parse**: `DefaultKeyParser` converts `"database:main_db"` to `ParsedReference(id="database", instance="main_db")`
 2. **Lookup**: Find the class registered with ID "database"
 3. **Dependency Analysis**: Scan for `$singleton_name` references in parameters
 4. **Topological Sort**: Order instances to resolve dependencies first
@@ -448,9 +448,9 @@ config = mirror.reflect('minimal_config.json', FlexibleConfig)
 Create custom parsers for specialized reference formats:
 
 ```python
-from modelmirror.parser.reference_parser import ReferenceParser, ParsedReference, FormatValidation
+from modelmirror.parser.key_parser import KeyParser, ParsedReference, FormatValidation
 
-class VersionedReferenceParser(ReferenceParser):
+class VersionedKeyParser(KeyParser):
     """Supports format: service@v1.0:instance_name"""
 
     def _validate(self, reference: str) -> FormatValidation:
@@ -469,7 +469,7 @@ class VersionedReferenceParser(ReferenceParser):
         return ParsedReference(id=id_part, instance=instance)
 
 # Use your custom parser
-mirror = Mirror('myapp', parser=VersionedReferenceParser())
+mirror = Mirror('myapp', parser=VersionedKeyParser())
 ```
 
 ### Custom Placeholders
@@ -500,7 +500,7 @@ mirror = Mirror('myapp', placeholder='$service')
 ### Combining Custom Parser and Placeholder
 
 ```python
-class AtSymbolParser(ReferenceParser):
+class AtSymbolParser(KeyParser):
     """Uses @ for instances: service@instance"""
 
     def _validate(self, reference: str) -> FormatValidation:
@@ -540,7 +540,7 @@ mirror = Mirror(
 ```python
 mirror = Mirror(
     package_name='myapp',           # Package to scan for registers
-    parser=DefaultReferenceParser(), # Reference parser (default: DefaultReferenceParser)
+    parser=DefaultKeyParser(), # Reference parser (default: DefaultKeyParser)
     placeholder='$mirror'           # JSON field name (default: '$mirror')
 )
 ```

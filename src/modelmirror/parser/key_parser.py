@@ -4,7 +4,7 @@ from typing import final
 
 
 @dataclass
-class ParsedReference:
+class ParsedKey:
     id: str
     instance: str | None = None
 
@@ -15,7 +15,7 @@ class FormatValidation:
     reason: str = ""
 
 
-class ReferenceParser(ABC):
+class KeyParser(ABC):
     __name__: str
 
     def __init__(self, placeholder: str):
@@ -23,18 +23,18 @@ class ReferenceParser(ABC):
         self.__name__ = f"{self.__class__.__name__}:{placeholder}"
 
     @abstractmethod
-    def _parse(self, reference: str) -> ParsedReference:
+    def _parse(self, key: str) -> ParsedKey:
         raise NotImplementedError
 
     @abstractmethod
-    def _validate(self, reference: str) -> FormatValidation:
+    def _validate(self, key: str) -> FormatValidation:
         raise NotImplementedError
 
     @final
-    def parse(self, reference: str) -> ParsedReference:
-        if not isinstance(reference, str):
-            raise ValueError(f"Reference must be a string. Error in reference: '{reference!r}")
-        format_validation = self._validate(reference)
+    def parse(self, key: str) -> ParsedKey:
+        if not isinstance(key, str):
+            raise ValueError(f"Reference must be a string. Error in reference: '{key!r}")
+        format_validation = self._validate(key)
         if format_validation.is_valid:
-            return self._parse(reference)
+            return self._parse(key)
         raise ValueError(format_validation.reason)

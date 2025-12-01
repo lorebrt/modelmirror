@@ -7,7 +7,7 @@ import unittest
 from pydantic import BaseModel, ConfigDict
 
 from modelmirror.mirror import Mirror
-from modelmirror.parser.default_reference_parser import DefaultReferenceParser
+from modelmirror.parser.default_key_parser import DefaultKeyParser
 from tests.fixtures.test_classes import DatabaseService, SimpleService
 
 
@@ -35,7 +35,7 @@ class TestMirrorSingletonCaching(unittest.TestCase):
     def test_mirror_different_parameters_create_different_instances(self):
         """Test that different parameters create different Mirror instances."""
         mirror1 = Mirror("tests.fixtures")
-        mirror2 = Mirror("tests.fixtures", DefaultReferenceParser("$ref"))
+        mirror2 = Mirror("tests.fixtures", DefaultKeyParser("$ref"))
 
         # Different parameters should create different instances
         self.assertIsNot(mirror1, mirror2, "Different parameters should create different instances")

@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from modelmirror.class_provider.class_reference import ClassReference
 from modelmirror.instance.instance_properties import InstanceProperties
 from modelmirror.instance.reference_service import ReferenceService
-from modelmirror.parser.reference_parser import ReferenceParser
+from modelmirror.parser.key_parser import KeyParser
 from modelmirror.reflections import Reflections
 from modelmirror.utils import json_utils
 
@@ -21,7 +21,7 @@ T = TypeVar("T", bound=BaseModel)
 class ReflectionEngine:
     """Core engine for processing configuration reflections."""
 
-    def __init__(self, registered_classes: list[ClassReference], parser: ReferenceParser):
+    def __init__(self, registered_classes: list[ClassReference], parser: KeyParser):
         self.__registered_classes = registered_classes
         self.__parser = parser
         self.__instance_properties: dict[str, InstanceProperties] = {}

@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 from modelmirror.cache.mirror_cache import MirrorCache
 from modelmirror.class_provider.class_scanner import ClassScanner
-from modelmirror.parser.default_reference_parser import DefaultReferenceParser
-from modelmirror.parser.reference_parser import ReferenceParser
+from modelmirror.parser.default_key_parser import DefaultKeyParser
+from modelmirror.parser.key_parser import KeyParser
 from modelmirror.reflection.reflection_engine import ReflectionEngine
 from modelmirror.reflections import Reflections
 from modelmirror.singleton.singleton_manager import MirrorSingletons
@@ -14,14 +14,14 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class Mirror:
-    def __new__(cls, package_name: str = "app", parser: ReferenceParser = DefaultReferenceParser()) -> "Mirror":
+    def __new__(cls, package_name: str = "app", parser: KeyParser = DefaultKeyParser()) -> "Mirror":
         return MirrorSingletons.get_or_create_instance(cls, package_name, parser)
 
-    def __init__(self, package_name: str = "app", parser: ReferenceParser = DefaultReferenceParser()):
+    def __init__(self, package_name: str = "app", parser: KeyParser = DefaultKeyParser()):
         if hasattr(self, "_initialized"):
             return
 
-        parser = parser or DefaultReferenceParser()
+        parser = parser or DefaultKeyParser()
         scanner = ClassScanner(package_name)
         registered_classes = scanner.scan()
 
