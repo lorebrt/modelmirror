@@ -14,20 +14,10 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class Mirror:
-    def __new__(
-        cls,
-        package_name: str = "app",
-        parser: ReferenceParser = DefaultReferenceParser(),
-        placeholder: str = "$mirror",
-    ) -> "Mirror":
-        return MirrorSingletons.get_or_create_instance(cls, package_name, parser, placeholder)
+    def __new__(cls, package_name: str = "app", parser: ReferenceParser = DefaultReferenceParser()) -> "Mirror":
+        return MirrorSingletons.get_or_create_instance(cls, package_name, parser)
 
-    def __init__(
-        self,
-        package_name: str = "app",
-        parser: ReferenceParser = DefaultReferenceParser(),
-        placeholder: str = "$mirror",
-    ):
+    def __init__(self, package_name: str = "app", parser: ReferenceParser = DefaultReferenceParser()):
         if hasattr(self, "_initialized"):
             return
 
@@ -35,7 +25,7 @@ class Mirror:
         scanner = ClassScanner(package_name)
         registered_classes = scanner.scan()
 
-        self.__engine = ReflectionEngine(registered_classes, parser, placeholder)
+        self.__engine = ReflectionEngine(registered_classes, parser)
         self._initialized = True
 
     def reflect(self, config_path: str, model: type[T], *, cached: bool = True) -> T:

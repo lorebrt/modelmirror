@@ -7,11 +7,9 @@ class MirrorSingletons:
     __instances: dict[str, Any] = {}
 
     @classmethod
-    def get_or_create_instance(
-        cls, mirror_class: type, package_name: str, parser: ReferenceParser, placeholder: str
-    ) -> Any:
+    def get_or_create_instance(cls, mirror_class: type, package_name: str, parser: ReferenceParser) -> Any:
         """Get existing singleton or create new one."""
-        instance_key = cls.__create_instance_key(package_name, parser, placeholder)
+        instance_key = cls.__create_instance_key(package_name, parser)
 
         if instance_key not in cls.__instances:
             instance: Any = object.__new__(mirror_class)
@@ -20,6 +18,6 @@ class MirrorSingletons:
         return cls.__instances[instance_key]
 
     @classmethod
-    def __create_instance_key(cls, package_name: str, parser: ReferenceParser, placeholder: str) -> str:
+    def __create_instance_key(cls, package_name: str, parser: ReferenceParser) -> str:
         """Create unique key for Mirror instance."""
-        return f"{package_name}:{type(parser).__name__}:{placeholder}"
+        return f"{package_name}:{parser.__name__}"

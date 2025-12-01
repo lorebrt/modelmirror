@@ -2,6 +2,9 @@ from modelmirror.parser.reference_parser import FormatValidation, ParsedReferenc
 
 
 class DefaultReferenceParser(ReferenceParser):
+    def __init__(self, placeholder: str = "$mirror"):
+        super().__init__(placeholder)
+
     def _validate(self, reference: str) -> FormatValidation:
         return FormatValidation(is_valid=True)
 

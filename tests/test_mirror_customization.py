@@ -8,6 +8,7 @@ import unittest
 from pydantic import BaseModel, ConfigDict
 
 from modelmirror.mirror import Mirror
+from modelmirror.parser.default_reference_parser import DefaultReferenceParser
 from modelmirror.parser.reference_parser import FormatValidation, ParsedReference, ReferenceParser
 from tests.fixtures.test_classes import DatabaseService, SimpleService, UserService
 
@@ -69,7 +70,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_custom_placeholder(self):
         """Test Mirror with custom placeholder."""
-        mirror = Mirror("tests.fixtures", placeholder="$ref")
+        mirror = Mirror("tests.fixtures", DefaultReferenceParser("$ref"))
 
         config_data = {"service": {"$ref": "simple_service", "name": "custom_placeholder"}}
 
@@ -81,7 +82,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_custom_parser_with_at_symbol(self):
         """Test Mirror with custom parser using @ for instances."""
-        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser())
+        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(placeholder="$mirror"))
 
         config_data = {
             "database": {
@@ -108,7 +109,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_versioned_parser(self):
         """Test Mirror with versioned parser."""
-        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser())
+        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser(placeholder="$mirror"))
 
         config_data = {"service": {"$mirror": "simple_service:v1.0", "name": "versioned_service"}}
 
@@ -120,7 +121,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_versioned_parser_with_instance(self):
         """Test versioned parser with instance."""
-        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser())
+        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser(placeholder="$mirror"))
 
         config_data = {
             "database": {
@@ -147,7 +148,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_custom_placeholder_and_parser_together(self):
         """Test Mirror with both custom placeholder and parser."""
-        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(), placeholder="$create")
+        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(placeholder="$create"))
 
         config_data = {
             "service": {"$create": "simple_service@my_instance", "name": "combined_test"},
@@ -168,7 +169,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_parser_validation_error(self):
         """Test that parser validation errors are properly raised."""
-        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser())
+        mirror = Mirror("tests.fixtures", parser=VersionedReferenceParser(placeholder="$mirror"))
 
         config_data = {"service": {"$mirror": "simple_service", "name": "invalid"}}  # Missing version
 
@@ -182,7 +183,7 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_raw_reflection_with_custom_features(self):
         """Test raw reflection works with custom parser and placeholder."""
-        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(), placeholder="$build")
+        mirror = Mirror("tests.fixtures", parser=CustomReferenceParser(placeholder="$build"))
 
         config_data = {"service": {"$build": "simple_service@shared", "name": "raw_test"}}
 

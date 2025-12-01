@@ -16,6 +16,12 @@ class FormatValidation:
 
 
 class ReferenceParser(ABC):
+    __name__: str
+
+    def __init__(self, placeholder: str):
+        self.placeholder = placeholder
+        self.__name__ = f"{self.__class__.__name__}:{placeholder}"
+
     @abstractmethod
     def _parse(self, reference: str) -> ParsedReference:
         raise NotImplementedError

@@ -21,10 +21,9 @@ T = TypeVar("T", bound=BaseModel)
 class ReflectionEngine:
     """Core engine for processing configuration reflections."""
 
-    def __init__(self, registered_classes: list[ClassReference], parser: ReferenceParser, placeholder: str):
+    def __init__(self, registered_classes: list[ClassReference], parser: ReferenceParser):
         self.__registered_classes = registered_classes
         self.__parser = parser
-        self.__placeholder = placeholder
         self.__instance_properties: dict[str, InstanceProperties] = {}
         self.__singleton_path: dict[str, str] = {}
         self.__reset_state()
@@ -63,9 +62,9 @@ class ReflectionEngine:
     def __create_instance_map(self, node_context: json_utils.NodeContext):
         node = node_context.node
 
-        if isinstance(node, dict) and self.__placeholder in node:
+        if isinstance(node, dict) and self.__parser.placeholder in node:
             node_id = node_context.path_str
-            raw_reference = node.pop(self.__placeholder)
+            raw_reference = node.pop(self.__parser.placeholder)
             params: dict[str, Any] = {name: prop for name, prop in node.items()}
             refs = self.__reference_service.find(list(params.values()))
 
