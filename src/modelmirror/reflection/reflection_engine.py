@@ -130,7 +130,8 @@ class ReflectionEngine:
             instance_id = node_context.path_str
             if instance_id in instances:
                 return instances[instance_id]
-            if isinstance(node, str) and node.startswith("$"):
+            model_link = self.__model_link_parser.parse(node)
+            if model_link and model_link.type == "instance":
                 if node not in self.__singleton_path:
                     raise Exception(f"Instance '{node}' not found")
                 instance_path = self.__singleton_path[node]
