@@ -112,7 +112,11 @@ class ReflectionEngine:
             instance_refs[instance] = self.__model_links_to_paths(properties.model_links)
         instance_names = list(TopologicalSorter(instance_refs).static_order())
         return self.__reference_service.resolve(
-            instance_names, self.__instance_properties, self.__singleton_path, self.__model_link_parser
+            instance_names,
+            self.__instance_properties,
+            self.__singleton_path,
+            self.__model_link_parser,
+            self.__registered_classes,
         )
 
     def __model_links_to_paths(self, model_links: list[ModelLink]) -> list[str]:
