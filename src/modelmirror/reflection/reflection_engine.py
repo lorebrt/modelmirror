@@ -12,7 +12,7 @@ from modelmirror.class_provider.class_reference import ClassReference
 from modelmirror.instance.instance_properties import InstanceProperties
 from modelmirror.instance.reference_service import ReferenceService
 from modelmirror.parser.code_link_parser import CodeLinkParser
-from modelmirror.parser.value_parser import ValueParser
+from modelmirror.parser.model_link_parser import ModelLinkParser
 from modelmirror.reflections import Reflections
 from modelmirror.utils import json_utils
 from modelmirror.utils.json_utils import NodeContext
@@ -24,13 +24,13 @@ class ReflectionEngine:
     """Core engine for processing configuration reflections."""
 
     def __init__(
-        self, registered_classes: list[ClassReference], code_link_parser: CodeLinkParser, value_parser: ValueParser
+        self, registered_classes: list[ClassReference], code_link_parser: CodeLinkParser, model_link: ModelLinkParser
     ):
         self.__registered_classes = registered_classes
         self.__code_link_parser = code_link_parser
         self.__instance_properties: dict[str, InstanceProperties] = {}
         self.__singleton_path: dict[str, str] = {}
-        self.__value_parser = value_parser
+        self.__model_link = model_link
         self.__reset_state()
 
     def reflect_typed(self, config_path: str, model: type[T]) -> T:
@@ -77,7 +77,7 @@ class ReflectionEngine:
         class_reference = self.__get_class_reference(code_link.id)
 
         node_id = node_context.path_str
-        refs = self.__reference_service.find(list(code_link.params.values()))
+        refs = self.__reference_service.find(list(code_link.params.values()), self.__model_link)
 
         self.__instance_properties[node_id] = InstanceProperties(
             node_id,

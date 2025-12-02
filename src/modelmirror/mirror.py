@@ -6,8 +6,8 @@ from modelmirror.cache.mirror_cache import MirrorCache
 from modelmirror.class_provider.class_scanner import ClassScanner
 from modelmirror.parser.code_link_parser import CodeLinkParser
 from modelmirror.parser.default_code_link_parser import DefaultCodeLinkParser
-from modelmirror.parser.default_value_parser import DefaultValueParser
-from modelmirror.parser.value_parser import ValueParser
+from modelmirror.parser.default_model_link_parser import DefaultModelLinkParser
+from modelmirror.parser.model_link_parser import ModelLinkParser
 from modelmirror.reflection.reflection_engine import ReflectionEngine
 from modelmirror.reflections import Reflections
 from modelmirror.singleton.singleton_manager import MirrorSingletons
@@ -20,7 +20,7 @@ class Mirror:
         cls,
         package_name: str = "app",
         code_link_parser: CodeLinkParser = DefaultCodeLinkParser(),
-        value_parser: ValueParser = DefaultValueParser(),
+        model_link_parser: ModelLinkParser = DefaultModelLinkParser(),
     ) -> "Mirror":
         return MirrorSingletons.get_or_create_instance(cls, package_name, code_link_parser)
 
@@ -28,14 +28,14 @@ class Mirror:
         self,
         package_name: str = "app",
         code_link_parser: CodeLinkParser = DefaultCodeLinkParser(),
-        value_parser: ValueParser = DefaultValueParser(),
+        model_link: ModelLinkParser = DefaultModelLinkParser(),
     ):
         if hasattr(self, "_initialized"):
             return
         scanner = ClassScanner(package_name)
         registered_classes = scanner.scan()
 
-        self.__engine = ReflectionEngine(registered_classes, code_link_parser, value_parser)
+        self.__engine = ReflectionEngine(registered_classes, code_link_parser, model_link)
         self._initialized = True
 
     def reflect(self, config_path: str, model: type[T], *, cached: bool = True) -> T:
