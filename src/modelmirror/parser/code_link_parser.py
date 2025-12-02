@@ -15,7 +15,7 @@ class FormatValidation:
     reason: str = ""
 
 
-class KeyParser(ABC):
+class CodeLinkParser(ABC):
     __name__: str
 
     def __init__(self, placeholder: str):

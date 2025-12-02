@@ -1,7 +1,7 @@
-from modelmirror.parser.key_parser import FormatValidation, KeyParser, ParsedKey
+from modelmirror.parser.code_link_parser import CodeLinkParser, FormatValidation, ParsedKey
 
 
-class DefaultKeyParser(KeyParser):
+class DefaultCodeLinkParser(CodeLinkParser):
     def __init__(self, placeholder: str = "$mirror"):
         super().__init__(placeholder)
 

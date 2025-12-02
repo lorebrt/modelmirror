@@ -4,9 +4,9 @@ from pydantic import BaseModel
 
 from modelmirror.cache.mirror_cache import MirrorCache
 from modelmirror.class_provider.class_scanner import ClassScanner
-from modelmirror.parser.default_key_parser import DefaultKeyParser
+from modelmirror.parser.code_link_parser import CodeLinkParser
+from modelmirror.parser.default_key_parser import DefaultCodeLinkParser
 from modelmirror.parser.default_value_parser import DefaultValueParser
-from modelmirror.parser.key_parser import KeyParser
 from modelmirror.parser.value_parser import ValueParser
 from modelmirror.reflection.reflection_engine import ReflectionEngine
 from modelmirror.reflections import Reflections
@@ -19,7 +19,7 @@ class Mirror:
     def __new__(
         cls,
         package_name: str = "app",
-        key_parser: KeyParser = DefaultKeyParser(),
+        key_parser: CodeLinkParser = DefaultCodeLinkParser(),
         value_parser: ValueParser = DefaultValueParser(),
     ) -> "Mirror":
         return MirrorSingletons.get_or_create_instance(cls, package_name, key_parser)
@@ -27,7 +27,7 @@ class Mirror:
     def __init__(
         self,
         package_name: str = "app",
-        key_parser: KeyParser = DefaultKeyParser(),
+        key_parser: CodeLinkParser = DefaultCodeLinkParser(),
         value_parser: ValueParser = DefaultValueParser(),
     ):
         if hasattr(self, "_initialized"):
