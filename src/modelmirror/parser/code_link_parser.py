@@ -1,18 +1,13 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass
-from typing import final
+from typing import Any
 
 
 @dataclass
 class ParsedKey:
     id: str
+    params: dict[str, Any]
     instance: str | None = None
-
-
-@dataclass
-class FormatValidation:
-    is_valid: bool
-    reason: str = ""
 
 
 class CodeLinkParser(ABC):
@@ -22,19 +17,17 @@ class CodeLinkParser(ABC):
         self.placeholder = placeholder
         self.__name__ = f"{self.__class__.__name__}:{placeholder}"
 
-    @abstractmethod
-    def _parse(self, key: str) -> ParsedKey:
-        raise NotImplementedError
+    def has_code_link(self, node: dict[str, Any]) -> bool:
+        if self.placeholder in node:
+            if isinstance(node[self.placeholder], str):
+                return True
+            raise ValueError(f"Value of '{self.placeholder}' must be a string")
+        return False
 
-    @abstractmethod
-    def _validate(self, key: str) -> FormatValidation:
-        raise NotImplementedError
-
-    @final
-    def parse(self, key: str) -> ParsedKey:
-        if not isinstance(key, str):
-            raise ValueError(f"Reference must be a string. Error in reference: '{key!r}")
-        format_validation = self._validate(key)
-        if format_validation.is_valid:
-            return self._parse(key)
-        raise ValueError(format_validation.reason)
+    def parse(self, node: dict[str, Any]) -> ParsedKey:
+        raw_reference: str = node.pop(self.placeholder)
+        params: dict[str, Any] = {name: prop for name, prop in node.items()}
+        if ":" in raw_reference:
+            id, instance = raw_reference.split(":", 1)
+            return ParsedKey(id=id, instance=f"${instance}", params=params)
+        return ParsedKey(id=raw_reference, instance=None, params=params)

@@ -15,6 +15,7 @@ from modelmirror.parser.code_link_parser import CodeLinkParser
 from modelmirror.parser.value_parser import ValueParser
 from modelmirror.reflections import Reflections
 from modelmirror.utils import json_utils
+from modelmirror.utils.json_utils import NodeContext
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -63,35 +64,37 @@ class ReflectionEngine:
             return reflection_config[0]
         raise Exception("Wrong config path")
 
-    def __create_instance_map(self, node_context: json_utils.NodeContext):
+    def __create_instance_map(self, node_context: NodeContext):
         node = node_context.node
 
-        if isinstance(node, dict) and self.__code_link_parser.placeholder in node:
-            node_id = node_context.path_str
-            raw_reference = node.pop(self.__code_link_parser.placeholder)
-            params: dict[str, Any] = {name: prop for name, prop in node.items()}
-            refs = self.__reference_service.find(list(params.values()))
+        if not isinstance(node, dict):
+            return node
+        if not self.__code_link_parser.has_code_link(node):
+            return node
+        reference = self.__code_link_parser.parse(node)
+        if not reference:
+            return node
+        class_reference = self.__get_class_reference(reference.id)
 
-            reference = self.__code_link_parser.parse(raw_reference)
-            instance = reference.instance
-            class_reference = self.__get_class_reference(reference.id)
+        node_id = node_context.path_str
+        refs = self.__reference_service.find(list(reference.params.values()))
 
-            self.__instance_properties[node_id] = InstanceProperties(
-                node_id,
-                node_context.parent_type,
-                class_reference,
-                refs,
-                params,
+        self.__instance_properties[node_id] = InstanceProperties(
+            node_id,
+            node_context.parent_type,
+            class_reference,
+            refs,
+            reference.params,
+        )
+
+        instance = reference.instance
+        if not instance:
+            return node
+        if instance in self.__singleton_path:
+            raise Exception(
+                f"Duplicate instance ID '{instance}'. Instance IDs must be globally unique across the whole config file."
             )
-
-            if instance:
-                instance_ref = f"${instance}"
-                if instance_ref in self.__singleton_path:
-                    raise Exception(
-                        f"Duplicate instance ID '{instance}'. Instance IDs must be globally unique across the whole config file."
-                    )
-                self.__singleton_path[instance_ref] = node_id
-        return node
+        self.__singleton_path[instance] = node_id
 
     def __get_class_reference(self, id: str) -> ClassReference:
         for registered_class in self.__registered_classes:

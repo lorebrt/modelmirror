@@ -4,11 +4,12 @@ Tests for Mirror class customization features: custom parsers and placeholders.
 
 import json
 import unittest
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
 
 from modelmirror.mirror import Mirror
-from modelmirror.parser.code_link_parser import CodeLinkParser, FormatValidation, ParsedKey
+from modelmirror.parser.code_link_parser import CodeLinkParser, ParsedKey
 from modelmirror.parser.default_key_parser import DefaultCodeLinkParser
 from tests.fixtures.test_classes import DatabaseService, SimpleService, UserService
 
@@ -16,33 +17,31 @@ from tests.fixtures.test_classes import DatabaseService, SimpleService, UserServ
 class CustomCodeLinkParser(CodeLinkParser):
     """Custom parser that uses @ symbol for instances: service@instance"""
 
-    def _validate(self, key: str) -> FormatValidation:
-        return FormatValidation(is_valid=True)
-
-    def _parse(self, key: str) -> ParsedKey:
-        if "@" in key:
-            id_part, instance = key.split("@", 1)
-            return ParsedKey(id=id_part, instance=instance)
-        return ParsedKey(id=key, instance=None)
+    def parse(self, node: dict[str, Any]) -> ParsedKey:
+        raw_reference: str = node.pop(self.placeholder)
+        params: dict[str, Any] = {name: prop for name, prop in node.items()}
+        if "@" in raw_reference:
+            id, instance = raw_reference.split("@", 1)
+            return ParsedKey(id=id, instance=f"${instance}", params=params)
+        return ParsedKey(id=raw_reference, instance=None, params=params)
 
 
 class VersionedCodeLinkParser(CodeLinkParser):
     """Parser that requires version: service:v1.0@instance"""
 
-    def _validate(self, key: str) -> FormatValidation:
-        if ":" not in key:
-            return FormatValidation(False, "Version required: use 'id:version' or 'id:version@instance'")
-        return FormatValidation(True)
-
-    def _parse(self, key: str) -> ParsedKey:
-        if "@" in key:
-            id_version, instance = key.split("@", 1)
+    def parse(self, node: dict[str, Any]) -> ParsedKey:
+        raw_reference: str = node.pop(self.placeholder)
+        params: dict[str, Any] = {name: prop for name, prop in node.items()}
+        if ":" not in raw_reference:
+            raise ValueError("Version required: use 'id:version' or 'id:version@instance'")
+        if "@" in raw_reference:
+            id_version, instance = raw_reference.split("@", 1)
         else:
-            id_version, instance = key, None
+            id_version, instance = raw_reference, None
 
         id_part, version = id_version.split(":", 1)
         # For testing, we ignore version and just use id
-        return ParsedKey(id=id_part, instance=instance)
+        return ParsedKey(id=id_part, instance=f"${instance}", params=params)
 
 
 class TestConfig(BaseModel):
