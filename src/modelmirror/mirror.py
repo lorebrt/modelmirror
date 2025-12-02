@@ -22,7 +22,7 @@ class Mirror:
         code_link_parser: CodeLinkParser = DefaultCodeLinkParser(),
         model_link_parser: ModelLinkParser = DefaultModelLinkParser(),
     ) -> "Mirror":
-        return MirrorSingletons.get_or_create_instance(cls, package_name, code_link_parser)
+        return MirrorSingletons.get_or_create_instance(cls, package_name, code_link_parser, model_link_parser)
 
     def __init__(
         self,

@@ -1,6 +1,7 @@
 from typing import Any, Mapping
 
 from modelmirror.instance.instance_properties import InstanceProperties
+from modelmirror.parser.model_link import ModelLink
 from modelmirror.parser.model_link_parser import ModelLinkParser
 
 
@@ -22,10 +23,11 @@ class ReferenceService:
                 self.__instances.update({instance_name: properties.class_reference.cls(**resolved_params)})
         return self.__instances
 
-    def find(self, values: list[Any], model_link: ModelLinkParser) -> list[str]:
+    def find(self, values: list[Any], model_link_parser: ModelLinkParser) -> list[ModelLink]:
         def resolve_value(value: Any) -> Any:
-            if isinstance(value, str) and value.startswith("$"):
-                refs.add(value)
+            model_link = model_link_parser.parse(value)
+            if model_link:
+                model_links.add(model_link)
                 return value
 
             # Recurse into dicts
@@ -41,10 +43,10 @@ class ReferenceService:
             # Anything else is returned as-is
             return value
 
-        refs: set[str] = set()
-        for v in values:
-            resolve_value(v)
-        return list(refs)
+        model_links: set[ModelLink] = set()
+        for value in values:
+            resolve_value(value)
+        return list(model_links)
 
     def __resolve_params(
         self, properties: InstanceProperties, instances: dict[str, Any], singleton_path: dict[str, str]

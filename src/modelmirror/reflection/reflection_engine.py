@@ -12,6 +12,7 @@ from modelmirror.class_provider.class_reference import ClassReference
 from modelmirror.instance.instance_properties import InstanceProperties
 from modelmirror.instance.reference_service import ReferenceService
 from modelmirror.parser.code_link_parser import CodeLinkParser
+from modelmirror.parser.model_link import ModelLink
 from modelmirror.parser.model_link_parser import ModelLinkParser
 from modelmirror.reflections import Reflections
 from modelmirror.utils import json_utils
@@ -77,13 +78,13 @@ class ReflectionEngine:
         class_reference = self.__get_class_reference(code_link.id)
 
         node_id = node_context.path_str
-        refs = self.__reference_service.find(list(code_link.params.values()), self.__model_link)
+        model_links = self.__reference_service.find(list(code_link.params.values()), self.__model_link)
 
         self.__instance_properties[node_id] = InstanceProperties(
             node_id,
             node_context.parent_type,
             class_reference,
-            refs,
+            model_links,
             code_link.params,
         )
 
@@ -105,16 +106,17 @@ class ReflectionEngine:
     def __resolve_instances(self) -> dict[str, Any]:
         instance_refs: dict[str, list[str]] = {}
         for instance, properties in self.__instance_properties.items():
-            instance_refs[instance] = self.__refs_to_paths(properties.refs)
+            instance_refs[instance] = self.__model_links_to_paths(properties.model_links)
         instance_names = list(TopologicalSorter(instance_refs).static_order())
         return self.__reference_service.resolve(instance_names, self.__instance_properties, self.__singleton_path)
 
-    def __refs_to_paths(self, refs: list[str]) -> list[str]:
+    def __model_links_to_paths(self, model_links: list[ModelLink]) -> list[str]:
         paths: list[str] = []
-        for ref in refs:
-            if ref not in self.__singleton_path:
-                raise Exception(f"Id {ref} has not a corresponding reference")
-            paths.append(self.__singleton_path[ref])
+        for model_link in model_links:
+            if model_link.type == "instance":
+                if model_link.id not in self.__singleton_path:
+                    raise Exception(f"Id {model_link} has not a corresponding reference")
+                paths.append(self.__singleton_path[model_link.id])
         return paths
 
     def __instantiate_model(self, instances: dict[str, Any]):
