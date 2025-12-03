@@ -20,6 +20,13 @@ from tests.fixtures.test_classes import (
 )
 from tests.fixtures.test_classes_with_types import CircularServiceA, CircularServiceB, ServiceWithTypeRef
 from tests.fixtures.test_factory_classes import CircularDependentService, DependentService, ServiceFactory
+from tests.test_fast_api import (
+    International,
+    Language,
+    MSSQLConnectionParameters,
+    MSSQLConnectionPool,
+    MssqlLanguageStore,
+)
 
 
 class SimpleServiceRegister(ClassRegister):
@@ -88,3 +95,23 @@ class DependentServiceRegister(ClassRegister):
 
 class CircularDependentServiceRegister(ClassRegister):
     reference = ClassReference(id="circular_dependent_service", cls=CircularDependentService)
+
+
+class LanguageClassRegister(ClassRegister):
+    reference = ClassReference(id="language", cls=Language)
+
+
+class InternationalClassRegister(ClassRegister):
+    reference = ClassReference(id="international", cls=International)
+
+
+class MssqlLanguageStoreClassRegister(ClassRegister):
+    reference = ClassReference(id="language-store-mssql", cls=MssqlLanguageStore)
+
+
+class MssqlParamsClassRegister(ClassRegister):
+    reference = ClassReference(id="connection-param-mssql", cls=MSSQLConnectionParameters)
+
+
+class MssqlPoolClassRegister(ClassRegister):
+    reference = ClassReference(id="connection-pool-mssql", cls=MSSQLConnectionPool)
