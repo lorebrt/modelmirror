@@ -6,16 +6,8 @@ import importlib
 import pkgutil
 from typing import Dict, Type
 
-from pydantic import BaseModel, validate_call
-
 from modelmirror.class_provider.class_reference import ClassReference
 from modelmirror.class_provider.class_register import ClassRegister
-
-
-class IsolatedClassReference(BaseModel):
-    id: str
-    cls: Type
-    original_cls: Type
 
 
 class ClassScanner:
@@ -26,11 +18,11 @@ class ClassScanner:
         self.__original_classes: Dict[str, Type] = {}
         self.__isolated_classes: Dict[str, Type] = {}
 
-    def scan(self) -> list[IsolatedClassReference]:
+    def scan(self) -> list[ClassReference]:
         """Scan and create isolated class copies with validation."""
         self.__import_all_modules(self.__package_name)
         subclasses = self.__all_subclasses(ClassRegister)
-        classes_reference: list[IsolatedClassReference] = []
+        classes_reference: list[ClassReference] = []
 
         for cls in subclasses:
             if not cls.__module__.startswith(self.__package_name):
@@ -44,42 +36,14 @@ class ClassScanner:
                 raise Exception(f"Duplicate class registration with id {class_reference.id}")
 
             # Create isolated copy instead of modifying original
-            isolated_class = self.__create_isolated_class(class_reference.cls)
-            isolated_reference = IsolatedClassReference(
-                id=class_reference.id, cls=isolated_class, original_cls=class_reference.cls
-            )
+            # isolated_class = self.__create_isolated_class(class_reference.cls)
+            isolated_reference = ClassReference(id=class_reference.id, cls=class_reference.cls)
 
             classes_reference.append(isolated_reference)
 
         return classes_reference
 
-    def __create_isolated_class(self, original_class: Type) -> Type:
-        """Create an isolated copy of the class with validation."""
-        class_name = f"Isolated{original_class.__name__}"
-
-        # Store original for potential restoration
-        self.__original_classes[class_name] = original_class
-
-        # Create isolated class with validation
-        class IsolatedClass(original_class):
-            pass
-
-        IsolatedClass.__name__ = class_name
-        IsolatedClass.__qualname__ = class_name
-
-        # Add validation to the isolated class only
-        init_method = original_class.__init__
-        if init_method:
-            setattr(
-                IsolatedClass,
-                "__init__",
-                validate_call(config={"arbitrary_types_allowed": True, "extra": "forbid"})(init_method),
-            )
-
-        self.__isolated_classes[class_name] = IsolatedClass
-        return IsolatedClass
-
-    def __is_duplicate(self, reference: ClassReference, existing: list[IsolatedClassReference]) -> bool:
+    def __is_duplicate(self, reference: ClassReference, existing: list[ClassReference]) -> bool:
         return any(ref.id == reference.id for ref in existing)
 
     def __import_all_modules(self, package_name: str):

@@ -1,7 +1,8 @@
 from typing import Any, Mapping
 
-from modelmirror.class_provider.class_scanner import IsolatedClassReference
+from modelmirror.class_provider.class_scanner import ClassReference
 from modelmirror.instance.instance_properties import InstanceProperties
+from modelmirror.instance.validation_service import ValidationService
 from modelmirror.parser.model_link import ModelLink
 from modelmirror.parser.model_link_parser import ModelLinkParser
 
@@ -9,6 +10,7 @@ from modelmirror.parser.model_link_parser import ModelLinkParser
 class ReferenceService:
     def __init__(self) -> None:
         self.__instances: dict[str, Any] = {}
+        self.__validation_service: ValidationService = ValidationService()
 
     def resolve(
         self,
@@ -16,7 +18,7 @@ class ReferenceService:
         instance_properties: dict[str, InstanceProperties],
         singleton_path: dict[str, str],
         model_link_parser: ModelLinkParser,
-        registered_classes: list[IsolatedClassReference],
+        registered_classes: list[ClassReference],
     ) -> dict[str, Any]:
         self.__instances = {}
         for instance_name in instance_names:
@@ -25,16 +27,10 @@ class ReferenceService:
                 resolved_params = self.__resolve_params(
                     properties, self.__instances, singleton_path, model_link_parser, registered_classes
                 )
-                self.__validate_class_or_raise(properties.class_reference.cls, resolved_params)
-                original_instance = (properties.class_reference.original_cls)(**resolved_params)
+                self.__validation_service.validate_or_raise(properties.class_reference.cls, resolved_params)
+                original_instance = (properties.class_reference.cls)(**resolved_params)
                 self.__instances.update({instance_name: original_instance})
         return self.__instances
-
-    def __validate_class_or_raise(self, cls: type, params: dict[str, Any]) -> None:
-        try:
-            cls(**params)
-        except Exception as e:
-            raise e
 
     def find(self, values: list[Any], model_link_parser: ModelLinkParser) -> list[ModelLink]:
         def resolve_value(value: Any) -> Any:
@@ -67,7 +63,7 @@ class ReferenceService:
         instances: dict[str, Any],
         singleton_path: dict[str, str],
         model_link_parser: ModelLinkParser,
-        registered_classes: list[IsolatedClassReference],
+        registered_classes: list[ClassReference],
     ) -> dict[str, Any]:
         def resolve_value(key: str, value: Any, node_id: str) -> Any:
             # "$something" -> instances["something"]
@@ -85,7 +81,7 @@ class ReferenceService:
                 if model_link.type == "type":
                     for registered_class in registered_classes:
                         if registered_class.id == model_link.id:
-                            return registered_class.original_cls
+                            return registered_class.cls
                     raise KeyError(f"Class '{model_link.id}' not found. Check classes registration")
 
             if f"{node_id}.{key}" in instances:
