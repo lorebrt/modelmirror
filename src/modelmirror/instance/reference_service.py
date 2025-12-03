@@ -25,8 +25,16 @@ class ReferenceService:
                 resolved_params = self.__resolve_params(
                     properties, self.__instances, singleton_path, model_link_parser, registered_classes
                 )
-                self.__instances.update({instance_name: properties.class_reference.cls(**resolved_params)})
+                self.__validate_class_or_raise(properties.class_reference.cls, resolved_params)
+                original_instance = (properties.class_reference.original_cls)(**resolved_params)
+                self.__instances.update({instance_name: original_instance})
         return self.__instances
+
+    def __validate_class_or_raise(self, cls: type, params: dict[str, Any]) -> None:
+        try:
+            cls(**params)
+        except Exception as e:
+            raise e
 
     def find(self, values: list[Any], model_link_parser: ModelLinkParser) -> list[ModelLink]:
         def resolve_value(value: Any) -> Any:
