@@ -101,6 +101,7 @@ class ReflectionEngine:
                 f"Duplicate instance ID '{instance}'. Instance IDs must be globally unique across the whole config file."
             )
         self.__singleton_path[instance] = node_id
+        return node
 
     def __get_class_reference(self, id: str) -> ClassReference:
         for registered_class in self.__registered_classes:

@@ -80,4 +80,3 @@ class AppModel(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
     dataSourcesParams: list[MSSQLConnectionParameters]
     international: International
-    language: Language
