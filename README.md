@@ -7,10 +7,12 @@ A Python library for automatic configuration management using JSON files. It let
 - **Non-Intrusive**: Works with existing classes without modification
 - **Simple Registration**: Just create a registry entry linking schema to class
 - **JSON Configuration**: Human-readable configuration files
-- **Automatic Dependency Injection**: Reference instances with `$name` syntax
+- **Automatic Dependency Injection**: Reference instances with `$name` syntax and types with `$name$` syntax
 - **Singleton Management**: Reuse instances across your configuration
 - **Type Safety**: Pydantic integration for type checking and validation
 - **Dependency Resolution**: Automatic topological sorting of dependencies
+- **Thread-Safe**: Automatic per-thread/task Mirror instances with isolated caches
+- **Circular Dependency Detection**: Optional detection of circular type dependencies
 
 ## Quick Start - Complete Working Example
 
@@ -86,6 +88,8 @@ class AppConfig(BaseModel):
 }
 ```
 
+**Note**: Use `$name` for instance references and `$name$` for type references.
+
 ### Step 5: Load and Use
 
 ```python
@@ -112,6 +116,7 @@ from modelmirror.mirror import Mirror
 from modelmirror.class_provider.class_register import ClassRegister
 from modelmirror.class_provider.class_reference import ClassReference
 from pydantic import BaseModel, ConfigDict
+from typing import Type
 import json
 
 # 1. Define your service
@@ -151,6 +156,44 @@ with open('email_config.json', 'w') as f:
 mirror = Mirror('__main__')  # Use current module
 config = mirror.reflect('email_config.json', EmailConfig)
 print(config.email_service.send_email("user@example.com", "Welcome!"))
+```
+
+### Example 1b: Type Reference Configuration
+
+```python
+# Example using type references
+class ServiceFactory:
+    def __init__(self, name: str, service_type: Type[EmailService]):
+        self.name = name
+        self.service_type = service_type
+
+    def create_service(self, **kwargs):
+        return self.service_type(**kwargs)
+
+class ServiceFactoryRegister(ClassRegister):
+    reference = ClassReference(id="service_factory", cls=ServiceFactory)
+
+class FactoryConfig(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    factory: ServiceFactory
+
+# Configuration with type reference
+config_data = {
+    "factory": {
+        "$mirror": "service_factory",
+        "name": "EmailFactory",
+        "service_type": "$email_service$"  # Type reference with $ suffix
+    }
+}
+
+mirror = Mirror('__main__')
+config = mirror.reflect('factory_config.json', FactoryConfig)
+
+# Create instances dynamically
+email_service = config.factory.create_service(
+    smtp_host="smtp.gmail.com", port=587, username="app@example.com"
+)
+print(email_service.send_email("user@example.com", "Hello!"))
 ```
 
 ### Example 2: Dependency Injection with Singletons
@@ -529,24 +572,35 @@ except Exception as e:
 
 ## Technical Details
 
-### Mirror Singleton Behavior
+### Mirror Instance Management
 
-Mirror instances are singletons based on their configuration parameters:
+Mirror instances are automatically managed per thread/task context:
 
 ```python
-# These are the same instance
+# Same parameters in same thread = same instance
 mirror1 = Mirror('myapp')
 mirror2 = Mirror('myapp')
-assert mirror1 is mirror2  # True
+assert mirror1 is mirror2  # True - same singleton
 
-# Different parameters create different instances
-mirror3 = Mirror('myapp', placeholder='$ref')
-assert mirror1 is not mirror3  # True
+# Different parameters = different instances
+mirror3 = Mirror('myapp', check_circular_types=False)
+assert mirror1 is not mirror3  # True - different instance
+
+# Different threads automatically get separate instances
+import threading
+
+def worker():
+    mirror = Mirror('myapp')  # Separate instance per thread
+    return id(mirror)
+
+thread1 = threading.Thread(target=worker)
+thread2 = threading.Thread(target=worker)
+# Each thread gets its own Mirror instance
 ```
 
-### Automatic Caching
+### Instance-Level Caching
 
-By default, Mirror caches all reflections for performance:
+Each Mirror instance has its own isolated cache:
 
 ```python
 mirror = Mirror('myapp')
@@ -554,13 +608,61 @@ mirror = Mirror('myapp')
 # First call - processes configuration
 config1 = mirror.reflect('config.json', AppConfig)
 
-# Second call - returns cached result instantly
+# Second call - returns cached result from this instance
 config2 = mirror.reflect('config.json', AppConfig)
-assert config1 is config2  # True - same object
+assert config1 is config2  # True - same object from cache
 
-# Force fresh processing
-config3 = mirror.reflect('config.json', AppConfig, cached=False)
-assert config1 is not config3  # True - different object
+# Different Mirror instance has separate cache
+mirror2 = Mirror('myapp', check_circular_types=False)
+config3 = mirror2.reflect('config.json', AppConfig)
+assert config1 is not config3  # True - different cache
+
+# Force fresh processing (bypass cache)
+config4 = mirror.reflect('config.json', AppConfig, cached=False)
+assert config1 is not config4  # True - bypassed cache
+```
+
+### Type References
+
+Reference class types (not instances) using `$class_name$` syntax:
+
+```python
+# Configuration with type references
+config_data = {
+    "factory": {
+        "$mirror": "service_factory",
+        "name": "MyFactory",
+        "creates_type": "$user_service$"  # Type reference
+    },
+    "user_instance": {
+        "$mirror": "user_service",
+        "name": "John"
+    }
+}
+
+# The factory gets the UserService class, not an instance
+config = mirror.reflect('config.json', AppConfig)
+user_class = config.factory.creates_type  # This is the UserService class
+user_instance = user_class(name="Jane")   # Create new instance
+```
+
+### Circular Dependency Detection
+
+Optional detection of circular type dependencies:
+
+```python
+# Enable circular dependency detection (default: True)
+mirror = Mirror('myapp', check_circular_types=True)
+
+# This will raise ValueError if circular type dependencies exist
+try:
+    config = mirror.reflect('config.json', AppConfig)
+except ValueError as e:
+    print(f"Circular dependency detected: {e}")
+
+# Disable detection to allow circular type references
+mirror_permissive = Mirror('myapp', check_circular_types=False)
+config = mirror_permissive.reflect('config.json', AppConfig)  # Works
 ```
 
 ### Reference Resolution
@@ -633,20 +735,57 @@ Change the placeholder field from `$mirror` to anything you prefer:
 
 ```python
 from modelmirror.parser.default_code_link_parser import DefaultCodeLinkParser
+from modelmirror.parser.default_model_link_parser import DefaultModelLinkParser
 
 # Use $ref instead of $mirror
-custom_parser = DefaultCodeLinkParser(placeholder='$ref')
-mirror = Mirror('myapp', parser=custom_parser)
+custom_code_parser = DefaultCodeLinkParser(placeholder='$ref')
+# Use @type@ instead of $type$ for type references
+custom_model_parser = DefaultModelLinkParser(type_suffix='@')
+mirror = Mirror('myapp', code_link_parser=custom_code_parser, model_link_parser=custom_model_parser)
 ```
 
-**JSON with custom placeholder:**
+**JSON with custom placeholders:**
 ```json
 {
     "my_service": {
         "$ref": "service:shared",
-        "name": "Custom Placeholder Example"
+        "name": "Custom Placeholder Example",
+        "service_type": "@other_service@"
     }
 }
+```
+
+### Thread and Async Safety
+
+Mirror instances are automatically isolated per thread and async task:
+
+```python
+import threading
+import asyncio
+from modelmirror.mirror import Mirror
+
+def worker_thread():
+    # Each thread gets its own Mirror instance and cache
+    mirror = Mirror('myapp')
+    config = mirror.reflect('config.json', AppConfig)
+    return id(mirror), id(config)
+
+async def worker_task():
+    # Each async task gets its own Mirror instance and cache
+    mirror = Mirror('myapp')
+    config = mirror.reflect('config.json', AppConfig)
+    return id(mirror), id(config)
+
+# Different threads get different Mirror instances
+thread1 = threading.Thread(target=worker_thread)
+thread2 = threading.Thread(target=worker_thread)
+
+# Different async tasks get different Mirror instances
+async def main():
+    task1 = asyncio.create_task(worker_task())
+    task2 = asyncio.create_task(worker_task())
+    results = await asyncio.gather(task1, task2)
+    # Each task has different Mirror and config instances
 ```
 
 ### Flexible Instance Retrieval
