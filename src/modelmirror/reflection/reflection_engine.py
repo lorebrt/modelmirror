@@ -175,6 +175,13 @@ class ReflectionEngine:
                 if instance_path not in instances:
                     raise Exception(f"Instance path '{instance_path}' not found")
                 return instances[instance_path]
+
+            # Handle secrets for string values
+            if isinstance(node, str):
+                mirror_secret = self.__secret_parser.parse(node)
+                if mirror_secret:
+                    return mirror_secret.value
+
             return node
 
         return _hook

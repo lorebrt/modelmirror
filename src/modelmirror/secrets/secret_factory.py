@@ -1,20 +1,15 @@
 from pathlib import Path
 
-from pydantic_settings import BaseSettings
-
 
 class SecretFactory:
     def __init__(self, secrets_dir: str):
-        self.__env: Environment = Environment(secrets_dir)
+        self.__secrets_cache = self.__load_secrets(secrets_dir)
 
     def get(self, name: str) -> str:
-        return self.__env.get_secret(name)
-
-
-class Environment(BaseSettings):
-    def __init__(self, secrets_dir: str):
-        super().__init__(_secrets_dir=secrets_dir)
-        self.__secrets_cache = self.__load_secrets(secrets_dir)
+        secret: str | None = self.__secrets_cache.get(name)
+        if secret:
+            return secret
+        raise ValueError(f"Secret {name} not found")
 
     def __load_secrets(self, secrets_dir: str) -> dict[str, str]:
         path = Path(secrets_dir)
@@ -26,9 +21,3 @@ class Environment(BaseSettings):
             if secret_file.is_file():
                 secrets[secret_file.name] = secret_file.read_text(encoding="utf-8").strip()
         return secrets
-
-    def get_secret(self, name: str) -> str:
-        secret: str | None = self.__secrets_cache.get(name)
-        if secret:
-            return secret
-        raise ValueError(f"Secret {name} not found")
