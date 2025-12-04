@@ -13,6 +13,7 @@ A Python library for automatic configuration management using JSON files. It let
 - **Dependency Resolution**: Automatic topological sorting of dependencies
 - **Thread-Safe**: Automatic per-thread/task Mirror instances with isolated caches
 - **Circular Dependency Detection**: Optional detection of circular type dependencies
+- **Secret Management**: Automatic resolution of uppercase strings to secret values from files
 
 ## Quick Start - Complete Working Example
 
@@ -570,6 +571,122 @@ except Exception as e:
     print(f"❌ Expected validation error: {e}")
 ```
 
+### Example 6: Secret Management
+
+```python
+from modelmirror.mirror import Mirror
+from modelmirror.parser.default_secret_parser import DefaultSecretParser
+from modelmirror.class_provider.class_register import ClassRegister
+from modelmirror.class_provider.class_reference import ClassReference
+from pydantic import BaseModel, ConfigDict
+import json
+import tempfile
+from pathlib import Path
+
+# Service that uses secrets
+class DatabaseService:
+    def __init__(self, host: str, port: int, username: str, password: str):
+        self.host = host
+        self.port = port
+        self.username = username
+        self.password = password
+
+    def connect(self):
+        return f"Connected to {self.host}:{self.port} as {self.username}"
+
+class ApiService:
+    def __init__(self, name: str, database: DatabaseService, api_key: str):
+        self.name = name
+        self.database = database
+        self.api_key = api_key
+
+    def authenticate(self):
+        return f"API {self.name} authenticated with key: {self.api_key[:8]}..."
+
+# Register services
+class DatabaseServiceRegister(ClassRegister):
+    reference = ClassReference(id="database", cls=DatabaseService)
+
+class ApiServiceRegister(ClassRegister):
+    reference = ClassReference(id="api_service", cls=ApiService)
+
+# Schema
+class SecureConfig(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    database: DatabaseService
+    api_service: ApiService
+
+# Create secrets directory and files
+secrets_dir = Path(tempfile.mkdtemp()) / "secrets"
+secrets_dir.mkdir()
+
+# Create secret files (uppercase names are automatically detected)
+(secrets_dir / "DB_PASSWORD").write_text("super_secret_db_password")
+(secrets_dir / "API_KEY").write_text("sk-1234567890abcdef")
+(secrets_dir / "DB_USERNAME").write_text("admin")
+
+# Configuration with secrets (uppercase strings are resolved automatically)
+config_data = {
+    "database": {
+        "$mirror": "database:main_db",
+        "host": "localhost",
+        "port": 5432,
+        "username": "DB_USERNAME",  # Resolved to "admin"
+        "password": "DB_PASSWORD"   # Resolved to "super_secret_db_password"
+    },
+    "api_service": {
+        "$mirror": "api_service",
+        "name": "UserAPI",
+        "database": "$main_db",
+        "api_key": "API_KEY"        # Resolved to "sk-1234567890abcdef"
+    }
+}
+
+with open('secure_config.json', 'w') as f:
+    json.dump(config_data, f, indent=2)
+
+# Create custom secret parser pointing to secrets directory
+secret_parser = DefaultSecretParser(str(secrets_dir))
+mirror = Mirror('__main__', secret_parser=secret_parser)
+
+# Load configuration - secrets are automatically resolved
+config = mirror.reflect('secure_config.json', SecureConfig)
+
+print("🔐 Secrets resolved automatically:")
+print(config.database.connect())
+print(config.api_service.authenticate())
+print(f"Database password: {config.database.password}")
+print(f"API key: {config.api_service.api_key}")
+
+# Cleanup
+import shutil
+shutil.rmtree(secrets_dir.parent)
+```
+
+**Output:**
+```
+🔐 Secrets resolved automatically:
+Connected to localhost:5432 as admin
+API UserAPI authenticated with key: sk-12345...
+Database password: super_secret_db_password
+API key: sk-1234567890abcdef
+```
+
+**Secret Management Features:**
+- **Automatic Detection**: Only `UPPERCASE` strings are treated as secrets
+- **File-Based**: Secrets are read from individual files in a directory
+- **Secure**: Secrets are resolved at runtime, not stored in configuration files
+- **Flexible**: Works with nested objects, arrays, and `$mirror` parameters
+- **Configurable**: Custom secret parsers can implement different resolution strategies
+
+**Secret Directory Structure:**
+```
+secrets/
+├── DB_PASSWORD      # Contains: super_secret_db_password
+├── API_KEY          # Contains: sk-1234567890abcdef
+└── DB_USERNAME      # Contains: admin
+```
+
 ## Technical Details
 
 ### Mirror Instance Management
@@ -786,6 +903,60 @@ async def main():
     task2 = asyncio.create_task(worker_task())
     results = await asyncio.gather(task1, task2)
     # Each task has different Mirror and config instances
+```
+
+### Secret Management
+
+ModelMirror provides built-in secret management for secure configuration:
+
+```python
+from modelmirror.parser.default_secret_parser import DefaultSecretParser
+from modelmirror.mirror import Mirror
+
+# Default secret parser reads from /run/secrets (Docker secrets)
+mirror = Mirror('myapp')  # Uses DefaultSecretParser("/run/secrets")
+
+# Custom secrets directory
+secret_parser = DefaultSecretParser("/path/to/secrets")
+mirror = Mirror('myapp', secret_parser=secret_parser)
+
+# Configuration with secrets
+config_data = {
+    "database": {
+        "$mirror": "database",
+        "host": "localhost",
+        "password": "DB_PASSWORD",  # Uppercase = secret
+        "username": "db_user"       # Lowercase = literal value
+    }
+}
+```
+
+**Secret Resolution Rules:**
+- Only `UPPERCASE` strings are treated as secrets
+- Secrets are read from individual files in the secrets directory
+- File name matches the secret name (e.g., `DB_PASSWORD` file contains the password)
+- Works in nested objects, arrays, and `$mirror` parameters
+- Non-uppercase strings are used as literal values
+
+**Custom Secret Parser:**
+```python
+from modelmirror.parser.secret_parser import SecretParser
+from modelmirror.parser.miirror_secret import MirrorSecret
+
+class EnvironmentSecretParser(SecretParser):
+    """Resolve secrets from environment variables."""
+
+    def parse(self, name: str) -> MirrorSecret | None:
+        if name.startswith("ENV_"):
+            import os
+            value = os.getenv(name)
+            if value:
+                return MirrorSecret(value)
+        return None
+
+# Use custom parser
+custom_parser = EnvironmentSecretParser()
+mirror = Mirror('myapp', secret_parser=custom_parser)
 ```
 
 ### Flexible Instance Retrieval

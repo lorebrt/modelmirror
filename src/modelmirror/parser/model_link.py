@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Literal
 
-type ModelLinkType = Literal["type", "instance"]
+ModelLinkType = Literal["type", "instance"]
 
 
 @dataclass
