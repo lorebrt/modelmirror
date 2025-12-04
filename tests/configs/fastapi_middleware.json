@@ -1,0 +1,6 @@
+{
+    "app": {
+        "$mirror": "fastapi_app",
+        "title": "API with Middleware"
+    }
+}

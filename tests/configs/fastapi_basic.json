@@ -1,0 +1,8 @@
+{
+    "app": {
+        "$mirror": "fastapi_app",
+        "title": "Test API",
+        "description": "Test FastAPI application",
+        "version": "1.0.0"
+    }
+}

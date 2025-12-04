@@ -218,24 +218,10 @@ class TestThreadSafety(unittest.TestCase):
         registry_states = []
         results_lock = threading.Lock()
 
-        # Create config files upfront
-        import json
-        import os
-        import tempfile
-
-        config_files = []
-        for i in range(6):
-            config_data = {"service": {"$mirror": "stateful_service", "name": f"registry_test_{i}"}}
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
-                json.dump(config_data, f)
-                config_files.append(f.name)
-
         def capture_registry_state(thread_id: int):
             try:
                 mirror = Mirror("tests.fixtures")
-                temp_file = config_files[thread_id]
-
-                instances = mirror.reflect_raw(temp_file)
+                instances = mirror.reflect_raw("tests/configs/thread_stateful.json")
                 service = instances.get(StatefulService)
 
                 with results_lock:
@@ -251,28 +237,20 @@ class TestThreadSafety(unittest.TestCase):
                 with results_lock:
                     registry_states.append({"thread_id": thread_id, "registry_working": False, "error": str(e)})
 
-        try:
-            # Concurrent registry access
-            with ThreadPoolExecutor(max_workers=3) as executor:
-                futures = [executor.submit(capture_registry_state, i) for i in range(6)]
+        # Concurrent registry access
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [executor.submit(capture_registry_state, i) for i in range(6)]
 
-                for future in as_completed(futures):
-                    future.result()
+            for future in as_completed(futures):
+                future.result()
 
-            # Check for consistency
-            valid_states = [s for s in registry_states if "registry_working" in s]
-            if valid_states:
-                working_registries = [s["registry_working"] for s in valid_states]
-                all_working = all(working_registries)
+        # Check for consistency
+        valid_states = [s for s in registry_states if "registry_working" in s]
+        if valid_states:
+            working_registries = [s["registry_working"] for s in valid_states]
+            all_working = all(working_registries)
 
-                self.assertTrue(all_working, "All registries should work correctly under concurrency")
-        finally:
-            # Clean up config files
-            for config_file in config_files:
-                try:
-                    os.unlink(config_file)
-                except Exception:
-                    pass
+            self.assertTrue(all_working, "All registries should work correctly under concurrency")
 
     def test_different_parser_instances_create_different_mirrors(self):
         """Test that different parser instances create different Mirror instances."""

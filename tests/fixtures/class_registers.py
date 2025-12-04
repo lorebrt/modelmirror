@@ -5,7 +5,7 @@ These registers link the test classes to their schema identifiers.
 
 from modelmirror.class_provider.class_reference import ClassReference
 from modelmirror.class_provider.class_register import ClassRegister
-from tests.fixtures.fast_api_classes import (
+from tests.fixtures.helper_classes import (
     International,
     Language,
     MSSQLConnectionParameters,

@@ -2,7 +2,6 @@
 Tests for Mirror class customization features: custom parsers and placeholders.
 """
 
-import json
 import unittest
 from typing import Any
 
@@ -63,50 +62,25 @@ class TestMirrorCustomization(unittest.TestCase):
 
     def test_default_parser_and_placeholder(self):
         """Test that default parser and placeholder work correctly."""
-        # Create config with default $mirror placeholder
-        config_data = {"service": {"$mirror": "simple_service", "name": "default_test"}}
-
-        with open("/tmp/test_default.json", "w") as f:
-            json.dump(config_data, f)
-
-        config = self.default_mirror.reflect("/tmp/test_default.json", TestConfig)
+        config = self.default_mirror.reflect("tests/configs/mirror_default.json", TestConfig)
         self.assertEqual(config.service.name, "default_test")
 
     def test_custom_placeholder(self):
         """Test Mirror with custom placeholder."""
         mirror = Mirror("tests.fixtures", code_link_parser=DefaultCodeLinkParser("$ref"))
-
-        config_data = {"service": {"$ref": "simple_service", "name": "custom_placeholder"}}
-
-        with open("/tmp/test_custom_placeholder.json", "w") as f:
-            json.dump(config_data, f)
-
-        config = mirror.reflect("/tmp/test_custom_placeholder.json", TestConfig)
+        config = mirror.reflect("tests/configs/mirror_custom_placeholder.json", TestConfig)
         self.assertEqual(config.service.name, "custom_placeholder")
 
     def test_custom_parser_with_at_symbol(self):
         """Test Mirror with custom parser using @ for instances."""
         mirror = Mirror("tests.fixtures", code_link_parser=CustomCodeLinkParser(placeholder="$mirror"))
 
-        config_data = {
-            "database": {
-                "$mirror": "database_service@shared_db",
-                "host": "localhost",
-                "port": 5432,
-                "database_name": "testdb",
-            },
-            "user_service": {"$mirror": "user_service", "database": "$shared_db", "cache_enabled": True},
-        }
-
-        with open("/tmp/test_custom_parser.json", "w") as f:
-            json.dump(config_data, f)
-
         class CustomConfig(BaseModel):
             model_config = ConfigDict(arbitrary_types_allowed=True)
             database: DatabaseService
             user_service: UserService
 
-        config = mirror.reflect("/tmp/test_custom_parser.json", CustomConfig)
+        config = mirror.reflect("tests/configs/mirror_custom_parser.json", CustomConfig)
         self.assertEqual(config.database.host, "localhost")
         self.assertTrue(config.user_service.cache_enabled)
         self.assertIs(config.user_service.database, config.database)
@@ -114,38 +88,19 @@ class TestMirrorCustomization(unittest.TestCase):
     def test_versioned_parser(self):
         """Test Mirror with versioned parser."""
         mirror = Mirror("tests.fixtures", code_link_parser=VersionedCodeLinkParser(placeholder="$mirror"))
-
-        config_data = {"service": {"$mirror": "simple_service:v1.0", "name": "versioned_service"}}
-
-        with open("/tmp/test_versioned.json", "w") as f:
-            json.dump(config_data, f)
-
-        config = mirror.reflect("/tmp/test_versioned.json", TestConfig)
+        config = mirror.reflect("tests/configs/mirror_versioned.json", TestConfig)
         self.assertEqual(config.service.name, "versioned_service")
 
     def test_versioned_parser_with_instance(self):
         """Test versioned parser with instance."""
         mirror = Mirror("tests.fixtures", code_link_parser=VersionedCodeLinkParser(placeholder="$mirror"))
 
-        config_data = {
-            "database": {
-                "$mirror": "database_service:v2.0@main_db",
-                "host": "versioned.host",
-                "port": 5432,
-                "database_name": "versiondb",
-            },
-            "user_service": {"$mirror": "user_service:v1.0", "database": "$main_db", "cache_enabled": False},
-        }
-
-        with open("/tmp/test_versioned_instance.json", "w") as f:
-            json.dump(config_data, f)
-
         class VersionedConfig(BaseModel):
             model_config = ConfigDict(arbitrary_types_allowed=True)
             database: DatabaseService
             user_service: UserService
 
-        config = mirror.reflect("/tmp/test_versioned_instance.json", VersionedConfig)
+        config = mirror.reflect("tests/configs/mirror_versioned_instance.json", VersionedConfig)
         self.assertEqual(config.database.host, "versioned.host")
         self.assertFalse(config.user_service.cache_enabled)
         self.assertIs(config.user_service.database, config.database)
@@ -154,20 +109,12 @@ class TestMirrorCustomization(unittest.TestCase):
         """Test Mirror with both custom placeholder and parser."""
         mirror = Mirror("tests.fixtures", code_link_parser=CustomCodeLinkParser(placeholder="$create"))
 
-        config_data = {
-            "service": {"$create": "simple_service@my_instance", "name": "combined_test"},
-            "reference_test": {"value": "$my_instance"},  # This should resolve to the instance
-        }
-
-        with open("/tmp/test_combined.json", "w") as f:
-            json.dump(config_data, f)
-
         class CombinedConfig(BaseModel):
             model_config = ConfigDict(arbitrary_types_allowed=True)
             service: SimpleService
             reference_test: dict
 
-        config = mirror.reflect("/tmp/test_combined.json", CombinedConfig)
+        config = mirror.reflect("tests/configs/mirror_combined.json", CombinedConfig)
         self.assertEqual(config.service.name, "combined_test")
         self.assertIs(config.reference_test["value"], config.service)
 
@@ -175,13 +122,8 @@ class TestMirrorCustomization(unittest.TestCase):
         """Test that parser validation errors are properly raised."""
         mirror = Mirror("tests.fixtures", code_link_parser=VersionedCodeLinkParser(placeholder="$mirror"))
 
-        config_data = {"service": {"$mirror": "simple_service", "name": "invalid"}}  # Missing version
-
-        with open("/tmp/test_validation_error.json", "w") as f:
-            json.dump(config_data, f)
-
         with self.assertRaises(ValueError) as context:
-            mirror.reflect("/tmp/test_validation_error.json", TestConfig)
+            mirror.reflect("tests/configs/mirror_validation_error.json", TestConfig)
 
         self.assertIn("Version required", str(context.exception))
 
@@ -189,12 +131,7 @@ class TestMirrorCustomization(unittest.TestCase):
         """Test raw reflection works with custom parser and placeholder."""
         mirror = Mirror("tests.fixtures", code_link_parser=CustomCodeLinkParser(placeholder="$build"))
 
-        config_data = {"service": {"$build": "simple_service@shared", "name": "raw_test"}}
-
-        with open("/tmp/test_raw_custom.json", "w") as f:
-            json.dump(config_data, f)
-
-        instances = mirror.reflect_raw("/tmp/test_raw_custom.json")
+        instances = mirror.reflect_raw("tests/configs/mirror_raw_custom.json")
         service = instances.get(SimpleService)
         self.assertEqual(service.name, "raw_test")
 
