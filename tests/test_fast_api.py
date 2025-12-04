@@ -14,11 +14,11 @@ try:
     from fastapi.middleware.cors import CORSMiddleware
 
     class FastAPIDefaultConfig(BaseModel):
-        model_config = ConfigDict(arbitrary_types_allowed=True)
+        model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
         app: FastAPI
 
     class FastAPICompleteConfig(BaseModel):
-        model_config = ConfigDict(arbitrary_types_allowed=True)
+        model_config = ConfigDict(arbitrary_types_allowed=True, extra="forbid")
         international: International
         app: FastAPI
 
@@ -39,9 +39,9 @@ try:
             self.assertEqual(config.app.description, "Test FastAPI application")
             self.assertEqual(config.app.version, "1.0.0")
 
-        def test_fastapi_lifespan_creation(self):
+        def test_fastapi_complete_creation(self):
             """Test FastAPI lifespan creation through ModelMirror."""
-            config = self.mirror.reflect("tests/configs/fastapi_lifespan.json", FastAPIDefaultConfig)
+            config = self.mirror.reflect("tests/configs/fastapi_complete.json", FastAPICompleteConfig)
 
             # Verify FastAPI app is created correctly
             self.assertIsInstance(config.app, FastAPI)

@@ -1,3 +1,4 @@
+import inspect
 from typing import Any, Type
 
 from pydantic import validate_call
@@ -24,10 +25,21 @@ class ValidationService:
 
         init_method = original_class.__init__
         if init_method:
-            setattr(
-                IsolatedClass,
-                "__init__",
-                validate_call(config={"arbitrary_types_allowed": True, "extra": "forbid"})(init_method),
-            )
+            validated_init = self.__create_validated_init(init_method)
+            setattr(IsolatedClass, "__init__", validated_init)
 
         return IsolatedClass
+
+    def __create_validated_init(self, init_method):
+        """Create a validated init method, handling cls parameter conflicts."""
+        sig = inspect.signature(init_method)
+
+        # Check if 'cls' parameter exists (excluding 'self')
+        has_cls_param = "cls" in [p.name for p in sig.parameters.values() if p.name != "self"]
+
+        if has_cls_param:
+            # Skip validation for methods with cls parameter to avoid Pydantic conflicts
+            return init_method
+        else:
+            # No cls parameter, use validation
+            return validate_call(config={"arbitrary_types_allowed": True, "extra": "forbid"})(init_method)
