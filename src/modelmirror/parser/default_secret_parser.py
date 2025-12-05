@@ -1,4 +1,4 @@
-from modelmirror.parser.miirror_secret import MirrorSecret
+from modelmirror.parser.mirror_secret import MirrorSecret
 from modelmirror.parser.secret_parser import SecretParser
 from modelmirror.secrets.secret_factory import SecretFactory
 

@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict
 
 from modelmirror.mirror import Mirror
 from modelmirror.parser.default_secret_parser import DefaultSecretParser
-from modelmirror.parser.miirror_secret import MirrorSecret
+from modelmirror.parser.mirror_secret import MirrorSecret
 from modelmirror.secrets.secret_factory import SecretFactory
 
 

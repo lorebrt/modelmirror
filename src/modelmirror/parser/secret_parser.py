@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from modelmirror.parser.miirror_secret import MirrorSecret
+from modelmirror.parser.mirror_secret import MirrorSecret
 
 
 class SecretParser(ABC):
