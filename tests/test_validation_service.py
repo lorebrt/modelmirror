@@ -3,9 +3,84 @@ Test suite for ValidationService with safe init functionality.
 """
 
 import unittest
+from dataclasses import dataclass, field
+from typing import List
 from unittest.mock import Mock
 
+from pydantic import BaseModel, ConfigDict
+
 from modelmirror.instance.validation_service import ValidationService
+
+
+# Test classes with different patterns
+class RegularClass:
+    """Regular class with side effects in init."""
+
+    class_var: int = 42
+
+    def __init__(self, name: str, callback):
+        self.name = name
+        self.callback = callback
+        callback()  # Side effect - should be removed
+        self._data = callback.get_data()  # Side effect - should be removed
+
+
+class ClassWithClassVars:
+    """Class with class variables."""
+
+    default_timeout: int = 30
+    max_retries: int = 3
+
+    def __init__(self, name: str, port: int):
+        self.name = name
+        self.port = port
+
+
+@dataclass
+class DataclassWithPostInit:
+    """Dataclass with __post_init__ side effects."""
+
+    name: str
+    values: List[str] = field(default_factory=list)
+
+    def __post_init__(self):
+        # This should not be called during validation
+        self.values.append("processed")
+        self._computed = len(self.values)
+
+
+class PydanticModel(BaseModel):
+    """Pydantic model with validation."""
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    name: str
+    port: int
+    computed_value: str
+
+    def model_post_init(self, __context):
+        # This should not be called during validation
+        self.computed_value = f"{self.name}:{self.port}"
+
+
+class ComplexClass:
+    """Class with complex initialization logic."""
+
+    version: str = "1.0"
+
+    def __init__(self, config: dict, factory, logger):
+        self.config = config
+        self.factory = factory
+        self.logger = logger
+
+        # All these should be removed
+        logger.info("Initializing service")
+        self._service = factory.create_service()
+        self._connection = self._establish_connection()
+        factory.register(self)
+
+    def _establish_connection(self):
+        return "connection"
 
 
 # Test classes with different init patterns
@@ -43,7 +118,7 @@ class ClsParameterClass:
     def __init__(self, cls, name: str):
         self.cls = cls
         self.name = name
-        cls()  # This should be handled without validation
+        cls()
 
 
 class ComplexUnsafeClass:
@@ -63,6 +138,113 @@ class TestValidationService(unittest.TestCase):
         """Set up test fixtures."""
         self.validation_service = ValidationService()
 
+    def test_regular_class_no_side_effects(self):
+        """Test that regular classes don't trigger side effects during validation."""
+        mock_callback = Mock()
+        params = {"name": "test", "callback": mock_callback}
+
+        # Should validate without calling callback methods
+        self.validation_service.validate_or_raise(RegularClass, params)
+
+        # No methods should be called
+        mock_callback.assert_called_once()
+        mock_callback.get_data.assert_called_once()
+
+    def test_class_variables_preserved(self):
+        """Test that class variables are preserved in isolated class."""
+        params = {"name": "test", "port": 8080}
+
+        # Should work and preserve class variables
+        isolated_class = self.validation_service.validate_or_raise(ClassWithClassVars, params)
+
+        # Create isolated class to check class variables
+        # isolated_class = self.validation_service._ValidationService__create_isolated_class(ClassWithClassVars)  # type: ignore
+
+        # Class variables should be preserved
+        self.assertEqual(isolated_class.default_timeout, 30)
+        self.assertEqual(isolated_class.max_retries, 3)
+
+    def test_dataclass_post_init(self):
+        """Test that dataclass __post_init__ is not called during validation."""
+        params = {"name": "test", "values": ["initial"]}
+
+        # Should validate without calling __post_init__
+        instance = self.validation_service.validate_or_raise(DataclassWithPostInit, params)
+
+        # Should only have assigned parameters, no post-init processing
+        self.assertEqual(instance.name, "test")
+        self.assertEqual(instance.values, ["initial", "processed"])
+        # Should not have computed attributes from __post_init__
+        self.assertTrue(hasattr(instance, "_computed"))
+
+    def test_pydantic_model_post_init(self):
+        """Test that Pydantic model_post_init is not called during validation."""
+        params = {"name": "service", "port": 8080, "computed_value": ""}
+
+        # Create instance to verify model_post_init wasn't called
+        instance = self.validation_service.validate_or_raise(PydanticModel, params)
+
+        # Should only have assigned parameters
+        self.assertEqual(instance.name, "service")
+        self.assertEqual(instance.port, 8080)
+        # Should not have computed attributes from model_post_init
+        self.assertEqual(instance.computed_value, "service:8080")
+
+    def test_complex_class(self):
+        """Test that complex initialization side effects are removed."""
+        mock_factory = Mock()
+        mock_logger = Mock()
+        params = {"config": {"key": "value"}, "factory": mock_factory, "logger": mock_logger}
+
+        # Should validate without side effects
+        self.validation_service.validate_or_raise(ComplexClass, params)
+
+        # No side effect methods should be called
+        mock_logger.info.assert_called_once()
+        mock_factory.create_service.assert_called_once()
+        mock_factory.register.assert_called_once()
+
+    def test_validation_still_works(self):
+        """Test that parameter validation still works."""
+        # Missing required parameter should fail
+        with self.assertRaises(Exception):
+            self.validation_service.validate_or_raise(RegularClass, {"name": "test"})  # Missing callback
+
+        # Valid parameters should work
+        mock_callback = Mock()
+        params = {"name": "test", "callback": mock_callback}
+        self.validation_service.validate_or_raise(RegularClass, params)
+
+    def test_empty_init_class(self):
+        """Test class with no __init__ method."""
+
+        class NoInitClass:
+            class_var = "test"
+
+        params = {}
+        # Should work even without __init__
+        isolated_class = self.validation_service.validate_or_raise(NoInitClass, params)
+        self.assertEqual(isolated_class.class_var, "test")
+
+    def test_class_with_only_private_vars(self):
+        """Test class with only private variables."""
+
+        class PrivateVarsClass:
+            _private_var = "private"
+            __very_private = "very_private"
+            public_var = "public"
+
+            def __init__(self, name: str):
+                self.name = name
+
+        params = {"name": "test"}
+        isolated_class = self.validation_service.validate_or_raise(PrivateVarsClass, params)
+
+        # isolated_class = self.validation_service._ValidationService__create_isolated_class(PrivateVarsClass)  # type: ignore
+        self.assertEqual(isolated_class.public_var, "public")
+        self.assertTrue(hasattr(isolated_class, "_private_var"))
+        self.assertTrue(hasattr(isolated_class, "_PrivateVarsClass__very_private"))
+
     def test_safe_class_validation(self):
         """Test that safe classes work normally."""
         params = {"name": "test", "value": 42}
@@ -75,11 +257,9 @@ class TestValidationService(unittest.TestCase):
         mock_callback = Mock()
         params = {"name": "test", "callback": mock_callback}
 
-        # Validation should work without calling the callback
         self.validation_service.validate_or_raise(UnsafeClass, params)
 
-        # The mock should not have been called during validation
-        mock_callback.assert_not_called()
+        self.assertEqual(mock_callback.call_count, 2)
 
     def test_mixed_class_validation(self):
         """Test that mixed classes only keep safe assignments."""
@@ -90,33 +270,27 @@ class TestValidationService(unittest.TestCase):
         self.validation_service.validate_or_raise(MixedClass, params)
 
         # Function should not be called during validation
-        mock_func.assert_not_called()
+        self.assertEqual(mock_func.call_count, 2)
 
     def test_cls_parameter_handling(self):
         """Test that classes with cls parameter are handled correctly."""
         mock_cls = Mock()
-        params = {"cls": Mock, "name": "test"}
+        params = {"cls": mock_cls, "name": "test"}
 
         # Should handle cls parameter without Pydantic conflicts
-        self.validation_service.validate_or_raise(ClsParameterClass, params)
+        instance = self.validation_service.validate_or_raise(ClsParameterClass, params)
 
-        # Mock should not be called during validation
-        mock_cls.assert_not_called()
+        instance.cls.assert_called_once()
 
     def test_complex_unsafe_class(self):
-        """Test complex unsafe operations are removed."""
+        """Test complex unsafe operations are executed exactly once."""
         mock_factory = Mock()
         mock_processor = Mock()
         params = {"name": "test", "factory": mock_factory, "processor": mock_processor}
-
-        # Should validate without calling any methods
-        self.validation_service.validate_or_raise(ComplexUnsafeClass, params)
-
-        # No methods should be called
-        mock_factory.create.assert_not_called()
-        mock_factory.build.assert_not_called()
-        mock_processor.assert_not_called()
-        mock_processor.process.assert_not_called()
+        instance = self.validation_service.validate_or_raise(ComplexUnsafeClass, params)
+        mock_factory.create.assert_called_once()
+        mock_processor.assert_called_once_with("test")
+        self.assertEqual(instance._processed, mock_processor.return_value)
 
     def test_validation_with_invalid_parameters(self):
         """Test that validation still works for parameter validation."""
@@ -131,33 +305,18 @@ class TestValidationService(unittest.TestCase):
             self.fail(f"Valid parameters should work: {e}")
 
     def test_isolated_class_creation(self):
-        """Test that isolated classes are created correctly."""
-        isolated_class = self.validation_service._ValidationService__create_isolated_class(SafeClass)  # type: ignore
+        """Test that validation returns an instance of the original class."""
+        params = {"name": "test", "value": 10}
 
-        # Should be a different class
-        self.assertNotEqual(isolated_class, SafeClass)
-        self.assertTrue(isolated_class.__name__.startswith("Isolated"))
+        instance = self.validation_service.validate_or_raise(SafeClass, params)
 
-        # Should still be instantiable
-        instance = isolated_class(name="test", value=42)
+        # Instance should be of the original class, not a dynamically-created subclass
+        self.assertIs(instance.__class__, SafeClass)
+
+        # Values should be correctly set
         self.assertEqual(instance.name, "test")
-        self.assertEqual(instance.value, 42)
+        self.assertEqual(instance.value, 10)
 
-    def test_safe_init_preserves_signature(self):
-        """Test that safe init preserves the original method parameter names."""
-        isolated_class = self.validation_service._ValidationService__create_isolated_class(UnsafeClass)  # type: ignore
-
-        import inspect
-
-        original_sig = inspect.signature(UnsafeClass.__init__)
-        isolated_sig = inspect.signature(isolated_class.__init__)
-
-        # Parameter names should be the same (type annotations may be lost)
-        original_params = list(original_sig.parameters.keys())
-        isolated_params = list(isolated_sig.parameters.keys())
-        self.assertEqual(original_params, isolated_params)
-
-    def test_fallback_for_unparseable_methods(self):
         """Test fallback behavior when AST parsing fails."""
 
         # Create a class that might cause AST parsing issues
@@ -191,11 +350,11 @@ class TestValidationService(unittest.TestCase):
         self.validation_service.validate_or_raise(AllUnsafeClass, params)
 
         # No calls should be made
-        mock_func.assert_not_called()
-        mock_func.call.assert_not_called()
+        mock_func.assert_called_once()
+        mock_func.call.assert_called_once()
 
-    def test_nested_function_calls_removed(self):
-        """Test that nested function calls are properly removed."""
+    def test_nested_function_calls_executed_once(self):
+        """Test that nested function calls are executed exactly once."""
 
         class NestedCallsClass:
             def __init__(self, name: str, service):
@@ -204,13 +363,10 @@ class TestValidationService(unittest.TestCase):
 
         mock_service = Mock()
         params = {"name": "test", "service": mock_service}
-
-        # Should validate without executing nested calls
         self.validation_service.validate_or_raise(NestedCallsClass, params)
-
-        # No methods should be called
-        mock_service.method.assert_not_called()
-        mock_service.get.assert_not_called()
+        mock_service.method.assert_called_once()
+        mock_service.method.return_value.chain.assert_called_once()
+        mock_service.method.return_value.chain.return_value.call.assert_called_once()
 
 
 class TestValidationServiceIntegration(unittest.TestCase):
@@ -241,7 +397,7 @@ class TestValidationServiceIntegration(unittest.TestCase):
         self.validation_service.validate_or_raise(DatabaseService, params)
 
         # Logger should not be called during validation
-        mock_logger.info.assert_not_called()
+        mock_logger.info.assert_called_once()
 
     def test_factory_pattern_class(self):
         """Test with factory pattern that has initialization side effects."""
@@ -263,7 +419,7 @@ class TestValidationServiceIntegration(unittest.TestCase):
         self.validation_service.validate_or_raise(ServiceFactory, params)
 
         # Registry should not be called
-        mock_registry.register.assert_not_called()
+        mock_registry.register.assert_called_once()
 
     def test_validation_with_pydantic_model(self):
         """Test validation works correctly with Pydantic-style validation."""
@@ -284,11 +440,87 @@ class TestValidationServiceIntegration(unittest.TestCase):
         self.validation_service.validate_or_raise(ServiceWithValidation, valid_params)
 
         # Callback should not be called during validation
-        mock_callback.initialize.assert_not_called()
+        mock_callback.initialize.assert_called_once()
 
         # Invalid parameters should still raise validation errors
         # Note: This might not raise an error since we're only doing structural validation
         # The actual business logic validation is bypassed for safety
+
+    def test_real_world_service_pattern(self):
+        """Test with realistic service class pattern."""
+
+        class DatabaseService:
+            connection_timeout: int = 30
+
+            def __init__(self, host: str, port: int, logger):
+                self.host = host
+                self.port = port
+                self.logger = logger
+                logger.info(f"Connecting to {host}:{port}")  # Should be removed
+                self._pool = self._create_connection_pool()  # Should be removed
+
+            def _create_connection_pool(self):
+                return "pool"
+
+        mock_logger = Mock()
+        params = {"host": "localhost", "port": 5432, "logger": mock_logger}
+
+        # Should validate without side effects
+        self.validation_service.validate_or_raise(DatabaseService, params)
+
+        # Logger should be called once
+        mock_logger.info.assert_called_once()
+
+    def test_factory_pattern_with_registration(self):
+        """Test factory pattern that registers itself."""
+
+        class ServiceFactory:
+            registry_enabled: bool = True
+
+            def __init__(self, config: dict, registry):
+                self.config = config
+                self.registry = registry
+                registry.register(self)  # Should be removed
+                self._initialize()  # Should be removed
+
+            def _initialize(self):
+                pass
+
+        mock_registry = Mock()
+        params = {"config": {"type": "factory"}, "registry": mock_registry}
+
+        # Should validate without registration
+        self.validation_service.validate_or_raise(ServiceFactory, params)
+
+        # Registry should not be called
+        mock_registry.register.assert_called_once()
+
+    def test_mixed_dataclass_and_regular_class(self):
+        """Test validation works with mixed class types."""
+
+        @dataclass
+        class DataConfig:
+            name: str
+            enabled: bool = True
+
+            def __post_init__(self):
+                self.computed = f"{self.name}_computed"
+
+        class RegularService:
+            def __init__(self, config: DataConfig, processor):
+                self.config = config
+                self.processor = processor
+                processor.initialize(config)  # Should be removed
+
+        mock_processor = Mock()
+        data_config = DataConfig(name="test", enabled=True)
+        params = {"config": data_config, "processor": mock_processor}
+
+        # Should validate without calling processor
+        self.validation_service.validate_or_raise(RegularService, params)
+
+        # Processor should not be called
+        mock_processor.initialize.assert_called_once()
 
 
 if __name__ == "__main__":

@@ -29,8 +29,10 @@ class ReferenceService:
                 resolved_params = self.__resolve_params(
                     properties, self.__instances, singleton_path, model_link_parser, registered_classes, secret_parser
                 )
-                self.__validation_service.validate_or_raise(properties.class_reference.cls, resolved_params)
-                original_instance = (properties.class_reference.cls)(**resolved_params)
+                original_instance = self.__validation_service.validate_or_raise(
+                    properties.class_reference.cls, resolved_params
+                )
+                # original_instance = (properties.class_reference.cls)(**resolved_params)
                 self.__instances.update({instance_name: original_instance})
         return self.__instances
 
